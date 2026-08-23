@@ -19,6 +19,8 @@ import br.com.tamanhocerto.core.model.MetadataPolicy
 import br.com.tamanhocerto.core.model.SizeTarget
 import br.com.tamanhocerto.core.model.Suggestion
 import br.com.tamanhocerto.engine.JobEvent
+import br.com.tamanhocerto.core.model.RewardGate
+import br.com.tamanhocerto.engine.BatchPolicy
 import br.com.tamanhocerto.engine.OperationEngine
 import br.com.tamanhocerto.feature.tools.R
 import br.com.tamanhocerto.feature.tools.home.ToolId
@@ -41,6 +43,7 @@ import kotlin.math.roundToInt
 class ConfigureViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val engine: OperationEngine,
+    private val rewardGate: RewardGate,
     private val fileSaver: br.com.tamanhocerto.core.files.FileSaver,
     private val fileSharer: br.com.tamanhocerto.core.files.FileSharer,
     savedState: SavedStateHandle,
@@ -106,6 +109,13 @@ class ConfigureViewModel @Inject constructor(
         totalAfter = 0L
 
         runningJob = viewModelScope.launch {
+            // Um arquivo por vez e sempre livre; o lote passa pelo gate. Quem
+            // decide e a UI, nunca o engine (ENGINE-SPEC secao 9).
+            if (BatchPolicy.requiresReward(sources.size) && !rewardGate.requestUnlock()) {
+                // Recusa volta para a configuracao, sem erro.
+                return@launch
+            }
+
             val items = mutableListOf<ResultItem>()
             _state.update {
                 it.copy(phase = Phase.Running(percent = null, total = sources.size))

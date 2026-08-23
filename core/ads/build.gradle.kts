@@ -25,10 +25,14 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":core:model"))
+    api(project(":core:model"))
     implementation(libs.androidx.core.ktx)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.play.services.ads)
+    implementation(libs.user.messaging.platform)
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

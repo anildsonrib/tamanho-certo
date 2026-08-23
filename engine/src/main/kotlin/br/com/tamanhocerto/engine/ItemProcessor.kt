@@ -23,4 +23,19 @@ interface ItemProcessor {
         options: RunOptions,
         onProgress: suspend (percent: Int?) -> Unit,
     ): OperationResult
+
+    /**
+     * Operacoes que consomem a lista INTEIRA como uma unidade. `ImagesToPdf`
+     * e a unica: varias imagens viram UM documento (PRD secao 3.4), e nao um
+     * PDF por imagem.
+     */
+    suspend fun processAll(
+        inputs: List<ByteSource>,
+        operation: Operation,
+        options: RunOptions,
+        onProgress: suspend (percent: Int?) -> Unit,
+    ): OperationResult = process(0, inputs.first(), operation, options, onProgress)
 }
+
+/** true quando a operacao consome a lista inteira de uma vez. */
+fun Operation.consumesAllInputs(): Boolean = this is Operation.ImagesToPdf

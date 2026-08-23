@@ -4,4 +4,12 @@
     <string name="nav_home">Home</string>
     <string name="nav_privacy">Privacy policy</string>
     <string name="nav_about">About</string>
+
+    <!-- Anuncio e lote (fase 7) -->
+    <string name="batch_locked_title">Process several files at once</string>
+    <string name="batch_locked_body">Watch a short ad to unlock batch processing this time. One file at a time is always free.</string>
+    <string name="batch_watch">Watch ad</string>
+    <string name="batch_not_now">Not now</string>
+    <string name="batch_unlocked">Unlocked</string>
+    <string name="ads_consent_settings">Ad settings</string>
 </resources>

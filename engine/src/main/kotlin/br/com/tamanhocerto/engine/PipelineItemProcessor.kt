@@ -105,7 +105,8 @@ class PipelineItemProcessor @Inject constructor(
                 )
             }
 
-            is Operation.ImagesToPdf -> imagesToPdf(input, operation, options)
+            // Chega aqui so com uma imagem; varias passam por processAll.
+            is Operation.ImagesToPdf -> imagesToPdf(listOf(input), operation, options)
 
             is Operation.PdfToImages -> pdfToImages(input, operation)
         }
@@ -142,15 +143,35 @@ class PipelineItemProcessor @Inject constructor(
         }
     }
 
+    override suspend fun processAll(
+        inputs: List<ByteSource>,
+        operation: Operation,
+        options: RunOptions,
+        onProgress: suspend (percent: Int?) -> Unit,
+    ): OperationResult {
+        onProgress(null)
+        if (operation !is Operation.ImagesToPdf || inputs.isEmpty()) {
+            return OperationResult.Failed(FailureReason.UNKNOWN)
+        }
+        return try {
+            imagesToPdf(inputs, operation, options)
+        } catch (imaging: ImagingException) {
+            OperationResult.Failed(imaging.reason)
+        } catch (pdf: PdfException) {
+            OperationResult.Failed(pdf.reason)
+        }
+    }
+
     private suspend fun imagesToPdf(
-        input: ByteSource,
+        inputs: List<ByteSource>,
         operation: Operation.ImagesToPdf,
         options: RunOptions,
     ): OperationResult {
-        val file = allocate(input.displayName, suffixes.pdf, "pdf")
+        val first = inputs.first()
+        val file = allocate(first.displayName, suffixes.pdf, "pdf")
         val outcome = file.outputStream().use { out ->
             PdfBuilder.build(
-                sources = listOf(input),
+                sources = inputs,
                 spec = operation.page,
                 target = operation.target,
                 metadata = options.metadata,
@@ -160,7 +181,7 @@ class PipelineItemProcessor @Inject constructor(
 
         val ref = OutputRef(file, file.name, "application/pdf")
         val stats = Stats(
-            bytesBefore = input.byteSize ?: -1L,
+            bytesBefore = inputs.sumOf { it.byteSize ?: 0L },
             bytesAfter = outcome.bytesWritten,
             qualityUsed = outcome.embedQualityUsed,
         )

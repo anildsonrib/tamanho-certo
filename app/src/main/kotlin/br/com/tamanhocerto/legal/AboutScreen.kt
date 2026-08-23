@@ -24,6 +24,7 @@ fun AboutScreen(
     onBack: () -> Unit,
     onPrivacyClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onAdSettingsClick: (() -> Unit)? = null,
 ) {
     AppScaffold(
         title = stringResource(UiR.string.nav_about),
@@ -59,6 +60,13 @@ fun AboutScreen(
                 text = stringResource(R.string.about_privacy_link),
                 onClick = onPrivacyClick,
             )
+            // Reabrir o formulario de consentimento (ADS-SPEC secao 4).
+            onAdSettingsClick?.let { open ->
+                SecondaryAction(
+                    text = stringResource(UiR.string.ads_consent_settings),
+                    onClick = open,
+                )
+            }
         }
     }
 }

@@ -61,7 +61,27 @@ class DefaultOperationEngine @Inject constructor(
             return@flow
         }
 
-        emit(JobEvent.Started(inputs.size))
+        // ImagesToPdf junta tudo num documento so: um item, nao N.
+        val itemCount = if (operation.consumesAllInputs()) 1 else inputs.size
+        emit(JobEvent.Started(itemCount))
+
+        if (operation.consumesAllInputs()) {
+            val result = try {
+                processor.processAll(inputs, operation, options) { percent ->
+                    emit(JobEvent.Progress(0, 1, percent))
+                }
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (oom: OutOfMemoryError) {
+                OperationResult.Failed(FailureReason.OUT_OF_MEMORY)
+            } catch (error: Exception) {
+                OperationResult.Failed(error.toFailureReason())
+            }
+            emit(JobEvent.ItemDone(0, inputs.firstOrNull()?.displayName.orEmpty(), result))
+            val failed = if (result is OperationResult.Failed) 1 else 0
+            emit(JobEvent.Finished(succeeded = 1 - failed, failed = failed))
+            return@flow
+        }
 
         var succeeded = 0
         var failed = 0
