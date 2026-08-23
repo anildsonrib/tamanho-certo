@@ -5,4 +5,12 @@
     <string name="nav_home">Início</string>
     <string name="nav_privacy">Política de privacidade</string>
     <string name="nav_about">Sobre</string>
+
+    <!-- Anuncio e lote (fase 7) -->
+    <string name="batch_locked_title">Processar vários arquivos de uma vez</string>
+    <string name="batch_locked_body">Assista a um anúncio curto para liberar o processamento em lote desta vez. Um arquivo por vez é sempre gratuito.</string>
+    <string name="batch_watch">Assistir anúncio</string>
+    <string name="batch_not_now">Agora não</string>
+    <string name="batch_unlocked">Liberado</string>
+    <string name="ads_consent_settings">Configurações de anúncios</string>
 </resources>

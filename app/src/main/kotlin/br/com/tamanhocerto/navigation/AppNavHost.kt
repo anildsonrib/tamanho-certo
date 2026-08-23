@@ -13,6 +13,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import br.com.tamanhocerto.core.ads.AdsSettings
 import br.com.tamanhocerto.core.files.PickerContracts
 import br.com.tamanhocerto.feature.tools.configure.ConfigureRoute
 import br.com.tamanhocerto.feature.tools.configure.SelectionViewModel
@@ -20,6 +21,8 @@ import br.com.tamanhocerto.feature.tools.home.HomeScreen
 import br.com.tamanhocerto.feature.tools.home.ToolId
 import br.com.tamanhocerto.legal.AboutScreen
 import br.com.tamanhocerto.legal.PolicyScreen
+import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.launch
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
@@ -30,10 +33,6 @@ fun AppNavHost(navController: NavHostController) {
 
             // Tocar num cartao abre IMEDIATAMENTE o seletor do sistema; nao ha
             // tela intermediaria (UI-SPEC secao 3).
-            val pickImage = rememberLauncherForActivityResult(
-                ActivityResultContracts.PickVisualMedia(),
-            ) { uri -> onPicked(navController, selection, listOfNotNull(uri), pendingTool) }
-
             val pickImages = rememberLauncherForActivityResult(
                 ActivityResultContracts.PickMultipleVisualMedia(),
             ) { uris -> onPicked(navController, selection, uris, pendingTool) }
@@ -46,9 +45,10 @@ fun AppNavHost(navController: NavHostController) {
                 onToolClick = { tool ->
                     pendingTool = tool
                     when (tool) {
-                        ToolId.IMAGES_TO_PDF -> pickImages.launch(imageRequest())
+                        // PDF entra um por vez; imagem aceita varias, e o
+                        // lote passa pelo gate de recompensa (D7).
                         ToolId.PDF_TO_IMAGES -> pickPdf.launch(PickerContracts.PDF_MIME_FILTER)
-                        else -> pickImage.launch(imageRequest())
+                        else -> pickImages.launch(imageRequest())
                     }
                 },
                 onPrivacyClick = { navController.navigate(Destinations.POLICY) },
@@ -80,9 +80,12 @@ fun AppNavHost(navController: NavHostController) {
         }
 
         composable(Destinations.ABOUT) {
+            val scope = androidx.compose.runtime.rememberCoroutineScope()
+            val settings = adsSettings()
             AboutScreen(
                 onBack = { navController.popBackStack() },
                 onPrivacyClick = { navController.navigate(Destinations.POLICY) },
+                onAdSettingsClick = { scope.launch { settings.openConsentForm() } },
             )
         }
     }
@@ -116,4 +119,25 @@ private fun rememberHomeEntry(
     entry: androidx.navigation.NavBackStackEntry,
 ) = androidx.compose.runtime.remember(entry) {
     navController.getBackStackEntry(Destinations.HOME)
+}
+
+/**
+ * `AdsSettings` vive em `:core:ads`, que so o `:app` conhece. O acesso por
+ * EntryPoint evita passar a dependencia por toda a arvore de Composables.
+ */
+@dagger.hilt.EntryPoint
+@dagger.hilt.InstallIn(dagger.hilt.components.SingletonComponent::class)
+interface AdsEntryPoint {
+    fun adsSettings(): AdsSettings
+}
+
+@Composable
+private fun adsSettings(): AdsSettings {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    return androidx.compose.runtime.remember(context) {
+        EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            AdsEntryPoint::class.java,
+        ).adsSettings()
+    }
 }

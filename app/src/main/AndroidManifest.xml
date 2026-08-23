@@ -13,6 +13,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TamanhoCerto">
 
+        <!-- Exigido pelo SDK de anuncios. Declarar o ID nao inicializa nada
+             (ADS-SPEC secao 1); a inicializacao acontece em requestUnlock. -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="${admobAppId}" />
+
         <!-- sem android:screenOrientation: ignorado em sw600dp no Android 16 -->
         <activity
             android:name=".MainActivity"
