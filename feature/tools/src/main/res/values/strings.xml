@@ -13,4 +13,133 @@
     <string name="tool_pdf2img_sub">Salve as páginas do PDF como fotos</string>
     <string name="tool_convert_title">Converter formato</string>
     <string name="tool_convert_sub">Troque entre JPEG, PNG e WebP</string>
+
+    <!-- Acoes comuns -->
+    <string name="action_continue">Continuar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_save">Salvar</string>
+    <string name="action_share">Compartilhar</string>
+    <string name="action_redo">Refazer com outra configuração</string>
+    <string name="action_remove">Remover</string>
+    <string name="action_advanced">Opções avançadas</string>
+    <string name="action_details">Detalhes</string>
+    <string name="action_compare_hint">Toque e segure para ver o original</string>
+
+    <!-- Resumo da entrada -->
+    <string name="input_dimensions">%1$d × %2$d pixels</string>
+    <string name="input_size">Tamanho atual: %1$s</string>
+
+    <!-- Comprimir -->
+    <string name="compress_target_label">Qual o tamanho máximo?</string>
+    <string name="compress_target_hint">Limite comum em formulário de inscrição</string>
+    <string name="compress_custom_label">Outro valor</string>
+    <string name="compress_unit_kb">KB</string>
+    <string name="compress_unit_mb">MB</string>
+    <string name="compress_format_label">Formato do arquivo</string>
+    <string name="compress_quality_label">Qualidade</string>
+    <string name="compress_quality_mode">Usar qualidade em vez de tamanho</string>
+    <string name="compress_keep_metadata">Preservar dados da foto (local e câmera)</string>
+    <string name="compress_keep_metadata_off">A localização é removida do arquivo enviado</string>
+
+    <!-- Redimensionar -->
+    <string name="resize_tab_pixels">Pixels</string>
+    <string name="resize_tab_percent">Porcentagem</string>
+    <string name="resize_tab_longest">Maior lado</string>
+    <string name="resize_width">Largura</string>
+    <string name="resize_height">Altura</string>
+    <string name="resize_lock">Manter proporção</string>
+    <string name="resize_result">Resultado: %1$d × %2$d pixels</string>
+    <string name="resize_estimate">Tamanho estimado: %1$s</string>
+
+    <!-- Imagem para PDF -->
+    <string name="pdf_page_size">Tamanho da página</string>
+    <string name="pdf_page_a4">A4</string>
+    <string name="pdf_page_letter">Carta</string>
+    <string name="pdf_page_fit">Ajustar à imagem</string>
+    <string name="pdf_orientation">Orientação</string>
+    <string name="pdf_orientation_auto">Automática</string>
+    <string name="pdf_orientation_portrait">Retrato</string>
+    <string name="pdf_orientation_landscape">Paisagem</string>
+    <string name="pdf_margin">Margem</string>
+    <string name="pdf_margin_none">Nenhuma</string>
+    <string name="pdf_margin_small">Pequena</string>
+    <string name="pdf_margin_medium">Média</string>
+    <string name="pdf_target">Limitar o tamanho do PDF</string>
+    <string name="pdf_reorder_hint">Arraste para reordenar as páginas</string>
+
+    <!-- PDF para imagem -->
+    <string name="raster_pages">Páginas</string>
+    <string name="raster_pages_all">Todas</string>
+    <string name="raster_pages_range">Intervalo</string>
+    <string name="raster_from">De</string>
+    <string name="raster_to">Até</string>
+    <string name="raster_quality">Qualidade da imagem</string>
+    <string name="raster_quality_low">Baixa</string>
+    <string name="raster_quality_medium">Média</string>
+    <string name="raster_quality_high">Alta</string>
+    <string name="raster_quality_estimate">cerca de %1$s por página</string>
+
+    <!-- Converter -->
+    <string name="convert_target">Converter para</string>
+    <string name="convert_jpeg_hint">Para fotos e anexos pequenos</string>
+    <string name="convert_png_hint">Quando não pode perder nada e há transparência</string>
+    <string name="convert_webp_hint">O menor arquivo, quando o destino aceita</string>
+    <string name="convert_flatten_label">Cor de fundo no lugar da transparência</string>
+    <string name="convert_flatten_white">Branco</string>
+    <string name="convert_flatten_black">Preto</string>
+    <string name="convert_flatten_gray">Cinza</string>
+
+    <!-- Processamento -->
+    <string name="processing_title">Processando…</string>
+    <string name="processing_item">Arquivo %1$d de %2$d</string>
+    <string name="processing_cancel_confirm_title">Cancelar o processamento?</string>
+    <string name="processing_cancel_confirm_body">Os arquivos já concluídos continuam disponíveis.</string>
+    <string name="processing_cancel_confirm_yes">Cancelar</string>
+    <string name="processing_cancel_confirm_no">Continuar</string>
+
+    <!-- Resultado -->
+    <string name="result_success">Pronto</string>
+    <string name="result_before_after">%1$s → %2$s</string>
+    <string name="result_reduction">%1$d%% menor</string>
+    <string name="result_dimensions">Dimensões finais: %1$d × %2$d</string>
+    <string name="result_quality_used">Qualidade usada: %1$d</string>
+    <string name="result_saved">Arquivo salvo</string>
+
+    <!-- Avisos -->
+    <string name="notice_target_missed">Não deu para chegar a %1$s. O menor que conseguimos foi %2$s.</string>
+    <string name="notice_downsampled_memory">A imagem era muito grande e foi reduzida para caber na memória do aparelho.</string>
+    <string name="notice_no_upscale">O app não amplia imagens: o resultado ficou no tamanho original.</string>
+    <string name="notice_metadata_removed">A localização e os dados da câmera foram removidos.</string>
+    <string name="notice_png_lossless">PNG não perde qualidade, então quase nunca chega a um tamanho definido. Experimente JPEG ou WebP.</string>
+    <string name="notice_png_switch">Trocar para JPEG</string>
+
+    <!-- Dialogo de alvo nao atingido -->
+    <string name="downscale_title">Reduzir também as dimensões?</string>
+    <string name="downscale_body">Só diminuindo a qualidade não dá para chegar a %1$s. Podemos reduzir também a largura e a altura da imagem.</string>
+    <string name="downscale_yes">Reduzir as dimensões</string>
+    <string name="downscale_no">Ficar com o menor possível</string>
+
+    <!-- Erros -->
+    <string name="error_pdf_password">Este PDF está protegido por senha e não pode ser aberto pelo app. Remova a senha em um computador e tente de novo.</string>
+    <string name="error_file_corrupt">Não foi possível ler este arquivo. Ele pode estar incompleto ou danificado.</string>
+    <string name="error_format_unsupported">Este tipo de arquivo não é aceito. Use JPEG, PNG, WebP, HEIC ou PDF.</string>
+    <string name="error_out_of_space">Não há espaço livre suficiente no aparelho. Libere espaço e tente de novo.</string>
+    <string name="error_out_of_memory">Esta imagem é grande demais para o aparelho processar. Tente reduzir as dimensões primeiro.</string>
+    <string name="error_cancelled">Cancelado.</string>
+    <string name="error_unknown">Algo deu errado ao processar este arquivo. Tente outro arquivo ou reinicie o app.</string>
+
+    <!-- Bloqueios de formulario -->
+    <string name="invalid_target_zero">Informe um tamanho maior que zero.</string>
+    <string name="invalid_target_too_big">O limite precisa ser menor que o tamanho atual (%1$s).</string>
+    <string name="invalid_range">O intervalo precisa estar entre 1 e %1$d.</string>
+    <string name="invalid_no_images">Escolha pelo menos uma imagem.</string>
+    <string name="invalid_too_many">Escolha no máximo %1$d arquivos por vez.</string>
+
+    <!-- Sufixos de nome de arquivo (o usuario ve o nome, entao sao traduzidos) -->
+    <string name="suffix_compressed">-menor</string>
+    <string name="suffix_resized">-redimensionada</string>
+    <string name="suffix_converted">-convertida</string>
+    <string name="suffix_pdf">-documento</string>
+    <string name="suffix_page">-pagina</string>
+    <string name="fallback_filename">arquivo</string>
 </resources>
