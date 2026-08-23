@@ -104,6 +104,7 @@
     <string name="result_dimensions">Dimensões finais: %1$d × %2$d</string>
     <string name="result_quality_used">Qualidade usada: %1$d</string>
     <string name="result_saved">Arquivo salvo</string>
+    <string name="result_preview_description">Prévia do resultado</string>
 
     <!-- Avisos -->
     <string name="notice_target_missed">Não deu para chegar a %1$s. O menor que conseguimos foi %2$s.</string>

@@ -35,6 +35,8 @@ fun ImagesToPdfScreen(
     state: ConfigureUiState,
     form: OperationForm.ImagesToPdf,
     onFormChange: (OperationForm.ImagesToPdf) -> Unit,
+    onMoveImage: (from: Int, to: Int) -> Unit,
+    onRemoveImage: (index: Int) -> Unit,
     onStart: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -49,6 +51,11 @@ fun ImagesToPdfScreen(
         Text(
             text = stringResource(R.string.pdf_reorder_hint),
             style = MaterialTheme.typography.bodySmall,
+        )
+        ReorderableImageList(
+            items = state.input.items,
+            onMove = onMoveImage,
+            onRemove = onRemoveImage,
         )
 
         ChipGroup(
@@ -205,9 +212,9 @@ private fun sizeShortcutLabel(bytes: Long): String {
     val kb = 1024L
     val mb = kb * kb
     return if (bytes >= mb) {
-        "${'$'}{bytes / mb} " + stringResource(R.string.compress_unit_mb)
+        "${bytes / mb} " + stringResource(R.string.compress_unit_mb)
     } else {
-        "${'$'}{bytes / kb} " + stringResource(R.string.compress_unit_kb)
+        "${bytes / kb} " + stringResource(R.string.compress_unit_kb)
     }
 }
 
@@ -232,14 +239,26 @@ private fun <T> ChipGroup(
     }
 }
 
-@Preview(name = "Imagem para PDF", showBackground = true)
+@Preview(name = "Imagem para PDF — lista reordenavel", showBackground = true)
 @Composable
 private fun ImagesToPdfPreview() {
     TamanhoCertoTheme(dynamicColor = false) {
+        val state = previewState(ToolId.IMAGES_TO_PDF)
         ImagesToPdfScreen(
-            state = previewState(ToolId.IMAGES_TO_PDF),
+            state = state.copy(
+                input = state.input.copy(
+                    fileCount = 3,
+                    items = listOf(
+                        InputItem("foto1.jpg"),
+                        InputItem("foto2.jpg"),
+                        InputItem("foto3.jpg"),
+                    ),
+                ),
+            ),
             form = OperationForm.ImagesToPdf(),
             onFormChange = {},
+            onMoveImage = { _, _ -> },
+            onRemoveImage = {},
             onStart = {},
         )
     }

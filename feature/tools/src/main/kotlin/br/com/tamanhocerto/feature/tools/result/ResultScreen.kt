@@ -12,6 +12,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -20,6 +23,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import br.com.tamanhocerto.core.ui.component.BeforeAfterRow
+import br.com.tamanhocerto.core.ui.component.ImagePreview
 import br.com.tamanhocerto.core.ui.component.NoticeCard
 import br.com.tamanhocerto.core.ui.component.NoticeKind
 import br.com.tamanhocerto.core.ui.component.PrimaryAction
@@ -66,6 +70,24 @@ fun ResultScreen(
 
         state.beforeAfterText?.let {
             BeforeAfterRow(beforeAfterText = it, reductionText = state.reductionText)
+        }
+
+        // Toque longo mostra o original, para comparar (UI-SPEC secao 6).
+        state.previewBitmap?.let { preview ->
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                ImagePreview(
+                    result = preview,
+                    original = state.originalBitmap,
+                    contentDescription = stringResource(R.string.result_preview_description),
+                    emptyLabel = "",
+                )
+                if (state.originalBitmap != null) {
+                    Text(
+                        text = stringResource(R.string.action_compare_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
         }
 
         state.batchSummary?.let {
@@ -161,6 +183,35 @@ private fun ResultSuccessPreview() {
             onDownscaleAccept = {}, onDownscaleDecline = {},
         )
     }
+}
+
+/** Exercita a previa com toque longo, sem depender de asset real. */
+@Preview(name = "Resultado — com previa", showBackground = true)
+@Composable
+private fun ResultWithPreviewPreview() {
+    val resultBitmap = remember { solidColorBitmap(androidx.compose.ui.graphics.Color(0xFF2C6E49)) }
+    val originalBitmap = remember { solidColorBitmap(androidx.compose.ui.graphics.Color(0xFF8A5A00)) }
+    TamanhoCertoTheme(dynamicColor = false) {
+        ResultScreen(
+            state = ResultUiState(
+                items = listOf(
+                    ResultItem("foto-menor.jpg", "3,8 MB → 480 KB", ItemState.SUCCESS),
+                ),
+                beforeAfterText = "3,8 MB → 480 KB",
+                reductionText = "87% menor",
+                previewBitmap = resultBitmap,
+                originalBitmap = originalBitmap,
+            ),
+            onSave = {}, onShare = {}, onRedo = {}, onHome = {},
+            onDownscaleAccept = {}, onDownscaleDecline = {},
+        )
+    }
+}
+
+private fun solidColorBitmap(color: androidx.compose.ui.graphics.Color): androidx.compose.ui.graphics.ImageBitmap {
+    val bitmap = android.graphics.Bitmap.createBitmap(120, 90, android.graphics.Bitmap.Config.ARGB_8888)
+    android.graphics.Canvas(bitmap).drawColor(color.toArgb())
+    return bitmap.asImageBitmap()
 }
 
 @Preview(name = "Resultado — alvo nao atingido", showBackground = true)
