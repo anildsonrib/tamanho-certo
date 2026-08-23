@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- O tema visual e definido em Compose (:core:ui). Este tema existe so
+         para a janela antes do primeiro frame. -->
+    <style name="Theme.TamanhoCerto" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

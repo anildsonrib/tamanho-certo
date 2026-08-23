@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- pt-BR (padrao). Textos de navegacao, usados por mais de um modulo. -->
+<resources>
+    <string name="nav_back">Voltar</string>
+    <string name="nav_home">Início</string>
+    <string name="nav_privacy">Política de privacidade</string>
+    <string name="nav_about">Sobre</string>
+</resources>

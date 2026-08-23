@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icone PLACEHOLDER da fase 2: setas de reducao. Definitivo na fase 8. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M36,36h24v6H42v18h-6z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M72,72H48v-6h18V48h6z" />
+</vector>

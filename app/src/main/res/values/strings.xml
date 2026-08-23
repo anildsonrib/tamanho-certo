@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- pt-BR (padrao). Catalogo em docs/STRINGS.md. -->
+<resources>
+    <string name="app_name">Tamanho Certo</string>
+
+
+    <!-- Sobre -->
+    <string name="about_version">Versão %1$s</string>
+    <string name="about_package">Pacote: %1$s</string>
+    <string name="about_contact">Contato: %1$s</string>
+    <string name="about_privacy_link">Ler a política de privacidade</string>
+    <string name="about_local_processing">Todo o processamento acontece no seu aparelho. Nenhum arquivo é enviado para a internet.</string>
+</resources>

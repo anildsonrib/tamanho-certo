@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- pt-BR (padrao). Catalogo em docs/STRINGS.md. -->
+<resources>
+    <string name="home_title">O que você quer fazer?</string>
+
+    <string name="tool_compress_title">Comprimir imagem</string>
+    <string name="tool_compress_sub">Deixe a foto no tamanho que você precisa enviar</string>
+    <string name="tool_resize_title">Redimensionar imagem</string>
+    <string name="tool_resize_sub">Mude a largura e a altura da foto</string>
+    <string name="tool_img2pdf_title">Imagem para PDF</string>
+    <string name="tool_img2pdf_sub">Junte várias fotos em um documento</string>
+    <string name="tool_pdf2img_title">PDF para imagem</string>
+    <string name="tool_pdf2img_sub">Salve as páginas do PDF como fotos</string>
+    <string name="tool_convert_title">Converter formato</string>
+    <string name="tool_convert_sub">Troque entre JPEG, PNG e WebP</string>
+</resources>
