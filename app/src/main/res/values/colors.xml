@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Cor do icone placeholder da fase 2. O icone definitivo e da fase 8. -->
+    <color name="ic_launcher_background">#2C6E49</color>
+</resources>

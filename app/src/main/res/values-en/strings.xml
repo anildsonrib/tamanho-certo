@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Right Size</string>
+
+
+    <string name="about_version">Version %1$s</string>
+    <string name="about_package">Package: %1$s</string>
+    <string name="about_contact">Contact: %1$s</string>
+    <string name="about_privacy_link">Read the privacy policy</string>
+    <string name="about_local_processing">All processing happens on your device. No file is uploaded.</string>
+</resources>

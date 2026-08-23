@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_title">What do you need?</string>
+
+    <string name="tool_compress_title">Compress image</string>
+    <string name="tool_compress_sub">Make a photo fit the size you need to upload</string>
+    <string name="tool_resize_title">Resize image</string>
+    <string name="tool_resize_sub">Change a photo\'s width and height</string>
+    <string name="tool_img2pdf_title">Images to PDF</string>
+    <string name="tool_img2pdf_sub">Combine photos into one document</string>
+    <string name="tool_pdf2img_title">PDF to image</string>
+    <string name="tool_pdf2img_sub">Save PDF pages as pictures</string>
+    <string name="tool_convert_title">Convert format</string>
+    <string name="tool_convert_sub">Switch between JPEG, PNG and WebP</string>
+</resources>
