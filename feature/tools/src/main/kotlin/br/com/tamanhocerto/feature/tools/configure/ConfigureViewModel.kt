@@ -3,6 +3,8 @@ package br.com.tamanhocerto.feature.tools.configure
 import android.content.Context
 import android.net.Uri
 import android.text.format.Formatter
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,12 +28,15 @@ import br.com.tamanhocerto.feature.tools.R
 import br.com.tamanhocerto.feature.tools.home.ToolId
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -68,6 +73,7 @@ class ConfigureViewModel @Inject constructor(
         viewModelScope.launch {
             sources = uris.map { ContentByteSource.from(context.contentResolver, it) }
             val first = sources.firstOrNull()
+            val items = sources.map { InputItem(displayName = it.displayName ?: "") }
             _state.update { current ->
                 current.copy(
                     input = InputSummary(
@@ -77,11 +83,89 @@ class ConfigureViewModel @Inject constructor(
                         sizeText = first?.byteSize?.let {
                             context.getString(R.string.input_size, formatSize(it))
                         },
+                        items = items,
                     ),
                 )
             }
             revalidate()
+
+            // Miniaturas da lista reordenavel (imagem->PDF): decodificadas
+            // depois, para nao atrasar a entrada na tela (UI-SPEC secao 4.3).
+            if (tool == ToolId.IMAGES_TO_PDF) loadThumbnails()
         }
+    }
+
+    private suspend fun loadThumbnails() {
+        val snapshot = sources
+        for ((index, source) in snapshot.withIndex()) {
+            if (sources !== snapshot) return // a selecao mudou; descarta o resto
+            val bitmap = decodeThumbnail(source) ?: continue
+            _state.update { current ->
+                val items = current.input.items.toMutableList()
+                if (index !in items.indices) return@update current
+                items[index] = items[index].copy(thumbnail = bitmap)
+                current.copy(input = current.input.copy(items = items))
+            }
+        }
+    }
+
+    /**
+     * Miniatura simples via `BitmapFactory`, sem correcao de orientacao EXIF
+     * — e so uma previa da lista, e nao afeta o resultado final, que passa
+     * pelo `:imaging` de verdade. `:feature:tools` nao depende de `:imaging`
+     * (ARCHITECTURE.md secao 2), por isso o decode aqui e direto da API do
+     * Android, e nao pelo pipeline.
+     */
+    private suspend fun decodeThumbnail(source: ByteSource): ImageBitmap? =
+        decodeDownsampled(THUMBNAIL_MAX_PX) { source.openStream() }
+
+    /** Previa da tela de resultado: maior que a miniatura da lista. */
+    private suspend fun decodePreview(file: File): ImageBitmap? =
+        decodeDownsampled(PREVIEW_MAX_PX) { file.inputStream() }
+
+    private suspend fun decodePreview(source: ByteSource): ImageBitmap? =
+        decodeDownsampled(PREVIEW_MAX_PX) { source.openStream() }
+
+    private suspend fun decodeDownsampled(
+        maxPx: Int,
+        open: suspend () -> java.io.InputStream,
+    ): ImageBitmap? = withContext(Dispatchers.IO) {
+        runCatching {
+            val bounds = android.graphics.BitmapFactory.Options().apply {
+                inJustDecodeBounds = true
+            }
+            open().use { android.graphics.BitmapFactory.decodeStream(it, null, bounds) }
+            if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return@runCatching null
+
+            var sample = 1
+            while (bounds.outWidth / sample > maxPx || bounds.outHeight / sample > maxPx) {
+                sample *= 2
+            }
+            val options = android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }
+            val bitmap = open().use { android.graphics.BitmapFactory.decodeStream(it, null, options) }
+                ?: return@runCatching null
+            bitmap.asImageBitmap()
+        }.getOrNull()
+    }
+
+    /** Reordena `sources` e a lista visivel juntas: sao a mesma ordem. */
+    fun onReorderImages(from: Int, to: Int) {
+        if (from == to || from !in sources.indices || to !in sources.indices) return
+        sources = sources.toMutableList().apply { add(to, removeAt(from)) }
+        _state.update { current ->
+            val items = current.input.items.toMutableList().apply { add(to, removeAt(from)) }
+            current.copy(input = current.input.copy(items = items))
+        }
+    }
+
+    fun onRemoveImage(index: Int) {
+        if (index !in sources.indices) return
+        sources = sources.toMutableList().apply { removeAt(index) }
+        _state.update { current ->
+            val items = current.input.items.toMutableList().apply { removeAt(index) }
+            current.copy(input = current.input.copy(fileCount = items.size, items = items))
+        }
+        revalidate()
     }
 
     fun onFormChanged(form: OperationForm) {
@@ -352,12 +436,31 @@ class ConfigureViewModel @Inject constructor(
         )
     }
 
-    private fun buildResult(items: List<ResultItem>, finished: JobEvent.Finished): ResultUiState {
+    private suspend fun buildResult(
+        items: List<ResultItem>,
+        finished: JobEvent.Finished,
+    ): ResultUiState {
         val first = items.firstOrNull()
         val missed = items.any { it.state == ItemState.WARNING }
         val allFailed = items.isNotEmpty() && items.all { it.state == ItemState.FAILED }
 
         val needsDownscale = lastTargetBytes != null && suggestionWasDownscale
+
+        // Previa: so com um item de saida em imagem. Imagem->PDF nao tem
+        // previa aqui — o resultado e um PDF, e este modulo nao conhece
+        // `:pdf` (ARCHITECTURE.md secao 2).
+        val previewFile = first?.file
+        val isImageOutput = first?.mimeType?.startsWith("image/") == true
+        val previewBitmap = if (items.size == 1 && isImageOutput && previewFile != null) {
+            decodePreview(previewFile)
+        } else {
+            null
+        }
+        val originalBitmap = if (previewBitmap != null) {
+            sources.firstOrNull()?.let { decodePreview(it) }
+        } else {
+            null
+        }
 
         return ResultUiState(
             items = items,
@@ -400,6 +503,8 @@ class ConfigureViewModel @Inject constructor(
             } else {
                 null
             },
+            previewBitmap = previewBitmap,
+            originalBitmap = originalBitmap,
         )
     }
 
@@ -424,6 +529,12 @@ class ConfigureViewModel @Inject constructor(
     companion object {
         const val ARG_OPERATION_ID = "operationId"
         private const val FALLBACK_MIME = "application/octet-stream"
+
+        /** Lado maior da miniatura da lista reordenavel, em pixels. */
+        private const val THUMBNAIL_MAX_PX = 160
+
+        /** Lado maior da previa na tela de resultado, em pixels. */
+        private const val PREVIEW_MAX_PX = 640
     }
 }
 

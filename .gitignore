@@ -21,3 +21,7 @@ keystore.properties
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Fixtures originais recebidas do responsavel — as copias que o build usa
+# ja estao em src/androidTest/assets/ de cada modulo, versionadas.
+/app_test_fixtures/

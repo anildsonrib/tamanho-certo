@@ -84,6 +84,7 @@
     <string name="result_dimensions">Final size: %1$d × %2$d</string>
     <string name="result_quality_used">Quality used: %1$d</string>
     <string name="result_saved">File saved</string>
+    <string name="result_preview_description">Result preview</string>
     <string name="notice_target_missed">We couldn\'t reach %1$s. The smallest we got was %2$s.</string>
     <string name="notice_downsampled_memory">The image was very large and had to be reduced to fit in memory.</string>
     <string name="notice_no_upscale">This app doesn\'t enlarge images, so the result kept its original size.</string>

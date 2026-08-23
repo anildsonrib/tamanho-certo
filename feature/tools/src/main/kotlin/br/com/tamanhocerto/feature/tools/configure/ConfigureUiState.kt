@@ -32,6 +32,18 @@ data class InputSummary(
     val sizeBytes: Long? = null,
     val pageCount: Int? = null,
     val hasAlpha: Boolean = false,
+    /**
+     * Lista completa, usada por Imagem→PDF para a lista reordenavel
+     * (UI-SPEC secao 4.3). A ORDEM desta lista É a ordem das paginas: a tela
+     * reordena diretamente aqui, e o ViewModel reordena `sources` junto.
+     */
+    val items: List<InputItem> = emptyList(),
+)
+
+data class InputItem(
+    val displayName: String,
+    /** Nulo enquanto a miniatura ainda nao foi decodificada. */
+    val thumbnail: androidx.compose.ui.graphics.ImageBitmap? = null,
 )
 
 /** Bloqueio de formulario: a razao e uma chave de string, nunca texto solto. */
@@ -95,7 +107,6 @@ sealed interface OperationForm {
         val orientation: PageOrientation = PageOrientation.AUTO,
         val margin: PageMargin = PageMargin.SMALL,
         val targetBytes: Long? = null,
-        val order: List<Int> = emptyList(),
     ) : OperationForm
 
     data class PdfToImages(

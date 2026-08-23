@@ -1,6 +1,7 @@
 package br.com.tamanhocerto.feature.tools.configure
 
 import androidx.annotation.StringRes
+import androidx.compose.ui.graphics.ImageBitmap
 import br.com.tamanhocerto.core.model.FailureReason
 import br.com.tamanhocerto.feature.tools.R
 import java.io.File
@@ -18,6 +19,14 @@ data class ResultUiState(
     val notices: List<NoticeState> = emptyList(),
     /** Diálogo modal de alvo nao atingido; o unico do app. */
     val downscalePrompt: DownscalePrompt? = null,
+    /**
+     * Previa do resultado, com toque longo mostrando o original (UI-SPEC
+     * secao 6). So preenchida quando ha um unico item de saida em imagem —
+     * PDF de saida (imagem->PDF) nao tem previa, porque exigiria `:pdf` numa
+     * camada que nao o conhece (ARCHITECTURE.md secao 2).
+     */
+    val previewBitmap: ImageBitmap? = null,
+    val originalBitmap: ImageBitmap? = null,
 )
 
 enum class ResultBanner { SUCCESS, WARNING, ERROR }

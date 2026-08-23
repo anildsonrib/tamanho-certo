@@ -72,14 +72,25 @@ class ImagePipelineInstrumentedTest {
             out = out,
         )
 
-        // As dimensoes visuais ja vem trocadas, e a saida nasce em NORMAL.
+        // As dimensoes visuais ja vem trocadas, e a saida nao carrega rotacao.
         val result = BitmapFactory.decodeByteArray(out.toByteArray(), 0, out.size())
         assertEquals(info.width, result.width)
         assertEquals(info.height, result.height)
+
+        // STRIP_ALL nao escreve EXIF: o encoder do proprio Android grava um
+        // bloco minimo com Orientation = UNDEFINED (0), nao NORMAL (1) nem
+        // tag ausente. Os dois valores significam "nao rotacionar" para
+        // qualquer leitor correto — o que importa e que nao seja um valor
+        // que peca rotacao (ROTATE_90/180/270, FLIP, TRANSPOSE/TRANSVERSE).
         val exif = ExifInterface(out.toByteArray().inputStream())
-        assertEquals(
-            ExifInterface.ORIENTATION_NORMAL,
-            exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL),
+        val orientation = exif.getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_UNDEFINED,
+        )
+        assertTrue(
+            "orientation=$orientation deveria significar 'sem rotacao'",
+            orientation == ExifInterface.ORIENTATION_UNDEFINED ||
+                orientation == ExifInterface.ORIENTATION_NORMAL,
         )
     }
 

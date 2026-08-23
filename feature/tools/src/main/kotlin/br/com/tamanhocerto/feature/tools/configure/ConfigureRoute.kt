@@ -100,6 +100,8 @@ fun ConfigureRoute(
                     state = state,
                     form = form,
                     onFormChange = viewModel::onFormChanged,
+                    onMoveImage = viewModel::onReorderImages,
+                    onRemoveImage = viewModel::onRemoveImage,
                     onStart = { viewModel.onStart() },
                     modifier = content,
                 )
