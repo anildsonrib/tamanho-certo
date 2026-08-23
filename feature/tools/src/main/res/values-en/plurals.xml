@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="input_pages">
+        <item quantity="one">%1$d page</item>
+        <item quantity="other">%1$d pages</item>
+    </plurals>
+    <plurals name="result_batch_summary">
+        <item quantity="one">%1$d of %2$d file finished</item>
+        <item quantity="other">%1$d of %2$d files finished</item>
+    </plurals>
+</resources>
