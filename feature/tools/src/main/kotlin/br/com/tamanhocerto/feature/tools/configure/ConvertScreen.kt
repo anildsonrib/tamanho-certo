@@ -33,6 +33,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -58,6 +60,7 @@ fun ConvertScreen(
     state: ConfigureUiState,
     form: OperationForm.Convert,
     onFormChange: (OperationForm.Convert) -> Unit,
+    onRemoveFile: (index: Int) -> Unit,
     onStart: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -94,6 +97,106 @@ fun ConvertScreen(
                 onClick = onStart,
                 enabled = state.validation is Validation.Ok,
                 modifier = Modifier.fillMaxWidth(),
+            )
+
+            // Miniaturas dos arquivos selecionados, na area vazia abaixo do
+            // botao (pedido do responsavel em 2026-08-25). Alinhadas ao topo
+            // desse espaco e centralizadas — nao ao centro vertical da tela,
+            // para nao competir com o bloco principal acima.
+            if (state.input.items.isNotEmpty()) {
+                SelectedFilesGrid(items = state.input.items, onRemove = onRemoveFile)
+            }
+        }
+    }
+}
+
+private val ThumbnailSize = 72.dp
+private val ThumbnailBadgeSize = 22.dp
+
+@Composable
+private fun SelectedFilesGrid(items: List<InputItem>, onRemove: (index: Int) -> Unit) {
+    FlowRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp, alignment = Alignment.CenterHorizontally),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        items.forEachIndexed { index, item ->
+            SelectedFileThumbnail(
+                number = index + 1,
+                item = item,
+                onRemove = { onRemove(index) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun SelectedFileThumbnail(number: Int, item: InputItem, onRemove: () -> Unit) {
+    val shape = RoundedCornerShape(12.dp)
+    Box(modifier = Modifier.size(ThumbnailSize)) {
+        Box(
+            modifier = Modifier
+                .size(ThumbnailSize)
+                .clip(shape)
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh, shape)
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, shape),
+        ) {
+            val bitmap = item.thumbnail
+            if (bitmap != null) {
+                androidx.compose.foundation.Image(
+                    bitmap = bitmap,
+                    contentDescription = item.displayName,
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                    modifier = Modifier.size(ThumbnailSize).clip(shape),
+                )
+            }
+        }
+
+        // Numero de selecao, no canto superior esquerdo.
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .offset(x = (-6).dp, y = (-6).dp)
+                .size(ThumbnailBadgeSize)
+                .clip(RoundedCornerShape(50))
+                .background(MaterialTheme.colorScheme.primary),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = number.toString(),
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+
+        // Botao de descartar, no canto superior direito.
+        val removeDescription = stringResource(R.string.action_remove)
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .offset(x = 6.dp, y = (-6).dp)
+                .size(ThumbnailBadgeSize)
+                .clip(RoundedCornerShape(50))
+                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(50))
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = ripple(bounded = false),
+                    onClick = onRemove,
+                )
+                .semantics { contentDescription = removeDescription },
+            contentAlignment = Alignment.Center,
+        ) {
+            // Glifo de texto: evita adicionar a dependencia de
+            // material-icons-extended (mesmo padrao de ReorderableImageList.kt).
+            Text(
+                text = "✕",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
             )
         }
     }
@@ -325,6 +428,7 @@ private fun ConvertPreview() {
             ),
             form = OperationForm.Convert(),
             onFormChange = {},
+            onRemoveFile = {},
             onStart = {},
         )
     }

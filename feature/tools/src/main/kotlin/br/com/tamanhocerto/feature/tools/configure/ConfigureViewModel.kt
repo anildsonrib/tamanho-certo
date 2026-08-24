@@ -89,9 +89,11 @@ class ConfigureViewModel @Inject constructor(
             }
             revalidate()
 
-            // Miniaturas da lista reordenavel (imagem->PDF): decodificadas
-            // depois, para nao atrasar a entrada na tela (UI-SPEC secao 4.3).
-            if (tool == ToolId.IMAGES_TO_PDF) loadThumbnails()
+            // Miniaturas: lista reordenavel (imagem->PDF) e grade de
+            // selecionados (converter, pedido do responsavel em 2026-08-25).
+            // Decodificadas depois, para nao atrasar a entrada na tela
+            // (UI-SPEC secao 4.3).
+            if (tool == ToolId.IMAGES_TO_PDF || tool == ToolId.CONVERT) loadThumbnails()
         }
     }
 
@@ -328,6 +330,14 @@ class ConfigureViewModel @Inject constructor(
             }
 
             is OperationForm.ImagesToPdf -> when {
+                input.fileCount < 1 -> Validation.Blocked(R.string.invalid_no_images)
+                else -> Validation.Ok
+            }
+
+            // Passa a valer quando a grade de miniaturas ganhou o botao de
+            // descartar (2026-08-25): sem isso, remover todos os arquivos
+            // deixava "Continuar" habilitado sem nada para processar.
+            is OperationForm.Convert -> when {
                 input.fileCount < 1 -> Validation.Blocked(R.string.invalid_no_images)
                 else -> Validation.Ok
             }
