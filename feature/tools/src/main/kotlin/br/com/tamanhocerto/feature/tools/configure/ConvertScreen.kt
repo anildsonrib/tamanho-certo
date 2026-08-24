@@ -188,23 +188,25 @@ private fun SelectedFileThumbnail(number: Int, item: InputItem, onRemove: () -> 
                 .padding(horizontal = 6.dp, vertical = 1.5.dp),
         )
 
-        // Numero de selecao, centralizado. Sem fundo — o circulo escurecia a
-        // miniatura por baixo; so uma sombra leve no proprio texto mantem a
-        // leitura sem cobrir a foto (ajustado a pedido em 2026-08-25).
-        Text(
-            text = number.toString(),
-            color = androidx.compose.ui.graphics.Color.White,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Bold,
-            style = androidx.compose.ui.text.TextStyle(
-                shadow = androidx.compose.ui.graphics.Shadow(
-                    color = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.85f),
-                    offset = androidx.compose.ui.geometry.Offset(0f, 1f),
-                    blurRadius = 6f,
-                ),
-            ),
-            modifier = Modifier.align(Alignment.Center),
-        )
+        // Numero de selecao, dentro de um circulo pequeno que so cobre o
+        // proprio numero — nao escurece a miniatura em volta (pedido do
+        // responsavel em 2026-08-25, revertendo o "sem fundo" anterior por
+        // falta de visibilidade).
+        Box(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .size(22.dp)
+                .clip(RoundedCornerShape(50))
+                .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.55f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = number.toString(),
+                color = androidx.compose.ui.graphics.Color.White,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+            )
+        }
 
         // Botao de descartar, no canto superior direito, em vermelho suave
         // (nao saturado) — pedido do responsavel em 2026-08-25.
