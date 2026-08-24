@@ -4,6 +4,9 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,9 +27,19 @@ import br.com.tamanhocerto.legal.PolicyScreen
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 
+/** Duracao do fade entre telas; 200ms e o padrao do Material Motion para transicoes simples. */
+private const val SCREEN_TRANSITION_MS = 200
+
 @Composable
 fun AppNavHost(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = Destinations.HOME) {
+    NavHost(
+        navController = navController,
+        startDestination = Destinations.HOME,
+        enterTransition = { fadeIn(tween(SCREEN_TRANSITION_MS)) },
+        exitTransition = { fadeOut(tween(SCREEN_TRANSITION_MS)) },
+        popEnterTransition = { fadeIn(tween(SCREEN_TRANSITION_MS)) },
+        popExitTransition = { fadeOut(tween(SCREEN_TRANSITION_MS)) },
+    ) {
         composable(Destinations.HOME) { entry ->
             // Escopo do grafo: a selecao sobrevive a ida para `configure`.
             val selection: SelectionViewModel = hiltViewModel(entry)
