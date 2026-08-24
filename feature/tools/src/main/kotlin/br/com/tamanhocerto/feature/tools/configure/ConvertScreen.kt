@@ -169,21 +169,23 @@ private fun SelectedFileThumbnail(number: Int, item: InputItem, onRemove: () -> 
 
         // Nome do arquivo, identificado desde a selecao — nao depende da
         // miniatura ja ter carregado (pedido do responsavel em 2026-08-25).
-        // Faixa inferior fina, so o suficiente para o texto ficar legivel
-        // sem escurecer a miniatura (ajustado a pedido em 2026-08-25).
+        // Faixa baixa (padding vertical minimo), so a altura do texto — a
+        // opacidade volta ao valor original; o ajuste pedido foi de altura,
+        // nao de opacidade (correcao em 2026-08-25).
         Text(
             text = item.displayName,
             color = androidx.compose.ui.graphics.Color.White,
-            fontSize = 9.5.sp,
+            fontSize = 8.5.sp,
             fontWeight = FontWeight.Medium,
+            lineHeight = 10.sp,
             maxLines = 1,
             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
-                .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.22f))
-                .padding(horizontal = 6.dp, vertical = 4.dp),
+                .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.45f))
+                .padding(horizontal = 6.dp, vertical = 1.5.dp),
         )
 
         // Numero de selecao, centralizado. Sem fundo — o circulo escurecia a
