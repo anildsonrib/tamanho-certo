@@ -54,7 +54,7 @@ fun FormatPicker(
     }
 }
 
-private fun hintFor(format: ImageFormat): Int = when (format) {
+internal fun hintFor(format: ImageFormat): Int = when (format) {
     ImageFormat.JPEG -> R.string.convert_jpeg_hint
     ImageFormat.PNG -> R.string.convert_png_hint
     ImageFormat.WEBP -> R.string.convert_webp_hint

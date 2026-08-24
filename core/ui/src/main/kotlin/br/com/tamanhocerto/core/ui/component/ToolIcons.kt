@@ -135,6 +135,39 @@ val ToolIconPdfToImages: ImageVector by lazy {
     }.build()
 }
 
+/**
+ * Icone de arquivo de imagem, usado no cartao de resumo da tela
+ * "Converter formato" (referencia visual aprovada em 2026-08-25,
+ * `configure_convert_remodelado.html`).
+ * `rect x=3 y=4 w=18 h=16 rx=2` + `circle cx=9 cy=10 r=2` + `m4 17 5-5 4 4 2-2 5 5`
+ */
+val ToolIconFileImage: ImageVector by lazy {
+    builder("ToolIconFileImage").apply {
+        strokePath {
+            moveTo(5f, 4f)
+            horizontalLineToRelative(14f)
+            arcToRelative(2f, 2f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = 2f, dy1 = 2f)
+            verticalLineToRelative(12f)
+            arcToRelative(2f, 2f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = -2f, dy1 = 2f)
+            horizontalLineToRelative(-14f)
+            arcToRelative(2f, 2f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = -2f, dy1 = -2f)
+            verticalLineToRelative(-12f)
+            arcToRelative(2f, 2f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = 2f, dy1 = -2f)
+            close()
+
+            moveTo(7f, 10f)
+            arcToRelative(2f, 2f, 0f, isMoreThanHalf = true, isPositiveArc = true, dx1 = 4f, dy1 = 0f)
+            arcToRelative(2f, 2f, 0f, isMoreThanHalf = true, isPositiveArc = true, dx1 = -4f, dy1 = 0f)
+
+            moveTo(4f, 17f)
+            lineToRelative(5f, -5f)
+            lineToRelative(4f, 4f)
+            lineToRelative(2f, -2f)
+            lineToRelative(5f, 5f)
+        }
+    }.build()
+}
+
 /** `M21 12a9 9 0 1 1-2.64-6.36` + `M21 3v6h-6` */
 val ToolIconConvert: ImageVector by lazy {
     builder("ToolIconConvert").apply {

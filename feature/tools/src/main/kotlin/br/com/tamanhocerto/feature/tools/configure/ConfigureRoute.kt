@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.tamanhocerto.core.files.PickerContracts
@@ -49,11 +50,25 @@ fun ConfigureRoute(
         }
     }
 
+    // Titulo centralizado so na tela de Converter (referencia visual aprovada
+    // em 2026-08-25, `configure_convert_remodelado.html`) — as outras quatro
+    // telas de configuracao mantem o `TopAppBar` padrao, sem alteracao.
+    val centerTitle = state.tool == ToolId.CONVERT
     AppScaffold(
         title = stringResource(state.tool.titleRes()),
         modifier = modifier,
         navigationIcon = {
             SecondaryAction(text = stringResource(UiR.string.nav_back), onClick = onBack)
+        },
+        centerTitle = centerTitle,
+        titleStyle = if (centerTitle) {
+            androidx.compose.ui.text.TextStyle(
+                fontSize = 22.sp,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                letterSpacing = (-0.25).sp,
+            )
+        } else {
+            null
         },
     ) { padding ->
         val content = Modifier.padding(padding)
