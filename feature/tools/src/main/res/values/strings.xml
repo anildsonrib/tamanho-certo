@@ -82,6 +82,9 @@
     <string name="raster_quality_estimate">cerca de %1$s por página</string>
 
     <!-- Converter -->
+    <string name="convert_empty_title">Nenhum arquivo selecionado</string>
+    <string name="convert_empty_subtitle">Escolha as imagens que você quer converter</string>
+    <string name="action_select_files">Selecionar arquivos</string>
     <string name="convert_target">Converter para</string>
     <string name="convert_jpeg_hint">Para fotos e anexos pequenos</string>
     <string name="convert_png_hint">Quando não pode perder nada e há transparência</string>

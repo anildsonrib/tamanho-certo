@@ -63,6 +63,7 @@ fun ConvertScreen(
     onFormChange: (OperationForm.Convert) -> Unit,
     onRemoveFile: (index: Int) -> Unit,
     onStart: () -> Unit,
+    onPickFiles: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val accents = toolAccents(darkTheme = androidx.compose.foundation.isSystemInDarkTheme())
@@ -74,40 +75,94 @@ fun ConvertScreen(
             .padding(CardPadding),
         verticalArrangement = Arrangement.Center,
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            FileSummaryCard(input = state.input, accent = accents[0])
+        // Entrar direto no layout da ferramenta, sem o seletor do sistema
+        // abrir sozinho (pedido do responsavel em 2026-08-25, revertendo o
+        // gesto unico da UI-SPEC secao 3 so para esta tela). Sem arquivo
+        // selecionado, o cartao convida a escolher em vez de mostrar
+        // controles vazios.
+        if (state.input.items.isEmpty()) {
+            EmptySelectionCard(accent = accents[0], onPickFiles = onPickFiles)
+        } else {
+            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                FileSummaryCard(input = state.input, accent = accents[0])
 
-            FormatCard(
-                selected = form.format,
-                onSelect = { onFormChange(form.copy(format = it)) },
-                accents = accents,
-            )
-
-            // A pergunta da cor so aparece quando a transparencia seria perdida:
-            // o app pergunta em vez de decidir sozinho (PRD secao 3.3). Fora do
-            // escopo do redesenho — mantido com o visual anterior, simples.
-            if (state.input.hasAlpha && form.format == ImageFormat.JPEG) {
-                FlattenColorField(
-                    selected = form.flattenColor,
-                    onSelect = { onFormChange(form.copy(flattenColor = it)) },
+                FormatCard(
+                    selected = form.format,
+                    onSelect = { onFormChange(form.copy(format = it)) },
+                    accents = accents,
                 )
-            }
 
-            PrimaryAction(
-                text = stringResource(R.string.action_continue),
-                onClick = onStart,
-                enabled = state.validation is Validation.Ok,
-                modifier = Modifier.fillMaxWidth(),
-            )
+                // A pergunta da cor so aparece quando a transparencia seria perdida:
+                // o app pergunta em vez de decidir sozinho (PRD secao 3.3). Fora do
+                // escopo do redesenho — mantido com o visual anterior, simples.
+                if (state.input.hasAlpha && form.format == ImageFormat.JPEG) {
+                    FlattenColorField(
+                        selected = form.flattenColor,
+                        onSelect = { onFormChange(form.copy(flattenColor = it)) },
+                    )
+                }
 
-            // Miniaturas dos arquivos selecionados, na area vazia abaixo do
-            // botao (pedido do responsavel em 2026-08-25). Alinhadas ao topo
-            // desse espaco e centralizadas — nao ao centro vertical da tela,
-            // para nao competir com o bloco principal acima.
-            if (state.input.items.isNotEmpty()) {
+                PrimaryAction(
+                    text = stringResource(R.string.action_continue),
+                    onClick = onStart,
+                    enabled = state.validation is Validation.Ok,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                // Miniaturas dos arquivos selecionados, na area vazia abaixo do
+                // botao (pedido do responsavel em 2026-08-25). Alinhadas ao topo
+                // desse espaco e centralizadas — nao ao centro vertical da tela,
+                // para nao competir com o bloco principal acima.
                 SelectedFilesGrid(items = state.input.items, onRemove = onRemoveFile)
             }
         }
+    }
+}
+
+@Composable
+private fun EmptySelectionCard(accent: ToolAccent, onPickFiles: () -> Unit) {
+    val shape = RoundedCornerShape(CardRadius)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(MaterialTheme.colorScheme.surfaceContainer, shape)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, shape)
+            .padding(CardPadding),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .size(50.dp)
+                .clip(RoundedCornerShape(13.dp))
+                .background(accent.soft),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = ToolIconFileImage,
+                contentDescription = null,
+                tint = accent.color,
+                modifier = Modifier.size(26.dp),
+            )
+        }
+        Text(
+            text = stringResource(R.string.convert_empty_title),
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+        )
+        Text(
+            text = stringResource(R.string.convert_empty_subtitle),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 12.5.sp,
+            lineHeight = 16.sp,
+        )
+        PrimaryAction(
+            text = stringResource(R.string.action_select_files),
+            onClick = onPickFiles,
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        )
     }
 }
 
@@ -472,6 +527,7 @@ private fun ConvertPreview() {
             onFormChange = {},
             onRemoveFile = {},
             onStart = {},
+            onPickFiles = {},
         )
     }
 }

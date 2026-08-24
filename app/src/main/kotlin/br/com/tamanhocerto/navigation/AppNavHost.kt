@@ -58,6 +58,12 @@ fun AppNavHost(navController: NavHostController) {
                 onToolClick = { tool ->
                     pendingTool = tool
                     when (tool) {
+                        // Converter formato entra direto no layout da
+                        // ferramenta, sem o seletor do sistema abrir sozinho
+                        // (pedido do responsavel em 2026-08-25, revertendo o
+                        // gesto unico de UI-SPEC secao 3 so para esta
+                        // ferramenta) — a propria tela pede o arquivo.
+                        ToolId.CONVERT -> navController.navigate(Destinations.configure(tool.name))
                         // PDF entra um por vez; imagem aceita varias, e o
                         // lote passa pelo gate de recompensa (D7).
                         ToolId.PDF_TO_IMAGES -> pickPdf.launch(PickerContracts.PDF_MIME_FILTER)

@@ -66,6 +66,9 @@
     <string name="raster_quality_medium">Medium</string>
     <string name="raster_quality_high">High</string>
     <string name="raster_quality_estimate">about %1$s per page</string>
+    <string name="convert_empty_title">No files selected</string>
+    <string name="convert_empty_subtitle">Choose the images you want to convert</string>
+    <string name="action_select_files">Select files</string>
     <string name="convert_target">Convert to</string>
     <string name="convert_jpeg_hint">For photos and small attachments</string>
     <string name="convert_png_hint">When nothing can be lost and there\'s transparency</string>

@@ -2,6 +2,8 @@ package br.com.tamanhocerto.feature.tools.configure
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +40,13 @@ fun ConfigureRoute(
     val context = LocalContext.current
 
     LaunchedEffect(uris) { if (uris.isNotEmpty()) viewModel.onInputSelected(uris) }
+
+    // So a tela de Converter entra vazia e pede o arquivo por dentro do
+    // proprio layout (pedido do responsavel em 2026-08-25) — as outras
+    // quatro continuam recebendo a selecao pronta, feita em `home`.
+    val pickImagesLauncher = rememberLauncherForActivityResult(
+        PickerContracts.pickImages(),
+    ) { picked -> if (picked.isNotEmpty()) viewModel.onInputSelected(picked) }
 
     val saveLauncher = rememberLauncherForActivityResult(
         contract = PickerContracts.createDocument(
@@ -135,6 +144,7 @@ fun ConfigureRoute(
                     onFormChange = viewModel::onFormChanged,
                     onRemoveFile = viewModel::onRemoveImage,
                     onStart = { viewModel.onStart() },
+                    onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
                     modifier = content,
                 )
             }
@@ -143,6 +153,9 @@ fun ConfigureRoute(
 }
 
 private const val DEFAULT_MIME = "application/octet-stream"
+
+private fun imagePickRequest() =
+    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
 
 internal fun ToolId.titleRes(): Int = when (this) {
     ToolId.COMPRESS -> R.string.tool_compress_title
