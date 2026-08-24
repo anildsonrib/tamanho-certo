@@ -140,7 +140,14 @@ private fun SelectedFilesGrid(items: List<InputItem>, onRemove: (index: Int) -> 
 @Composable
 private fun SelectedFileThumbnail(number: Int, item: InputItem, onRemove: () -> Unit) {
     val shape = RoundedCornerShape(12.dp)
-    Box(modifier = Modifier.width(ThumbnailWidth).height(ThumbnailHeight)) {
+    Box(
+        modifier = Modifier
+            .width(ThumbnailWidth)
+            .height(ThumbnailHeight)
+            .semantics(mergeDescendants = true) {
+                contentDescription = "$number. ${item.displayName}"
+            },
+    ) {
         Box(
             modifier = Modifier
                 .width(ThumbnailWidth)
@@ -153,12 +160,30 @@ private fun SelectedFileThumbnail(number: Int, item: InputItem, onRemove: () -> 
             if (bitmap != null) {
                 androidx.compose.foundation.Image(
                     bitmap = bitmap,
-                    contentDescription = item.displayName,
+                    contentDescription = null,
                     contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                     modifier = Modifier.width(ThumbnailWidth).height(ThumbnailHeight).clip(shape),
                 )
             }
         }
+
+        // Nome do arquivo, identificado desde a selecao — nao depende da
+        // miniatura ja ter carregado (pedido do responsavel em 2026-08-25).
+        // Faixa inferior com scrim para ficar legivel sobre qualquer foto.
+        Text(
+            text = item.displayName,
+            color = androidx.compose.ui.graphics.Color.White,
+            fontSize = 9.5.sp,
+            fontWeight = FontWeight.Medium,
+            maxLines = 1,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.45f))
+                .padding(horizontal = 6.dp, vertical = 4.dp),
+        )
 
         // Numero de selecao, centralizado — no canto ele disputava espaco
         // com o botao de descartar (pedido do responsavel em 2026-08-25).
