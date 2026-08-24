@@ -30,6 +30,10 @@ data class InputSummary(
     val sizeText: String? = null,
     val pagesText: String? = null,
     val sizeBytes: Long? = null,
+    /** Ja formatado ("N arquivos selecionados"); so quando ha mais de um. */
+    val multiCountText: String? = null,
+    /** Ja formatado ("Tamanho total: X"); nulo se algum arquivo tiver tamanho desconhecido. */
+    val multiSizeText: String? = null,
     val pageCount: Int? = null,
     val hasAlpha: Boolean = false,
     /**

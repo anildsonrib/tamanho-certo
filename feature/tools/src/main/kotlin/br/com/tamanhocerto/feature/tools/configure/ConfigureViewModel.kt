@@ -74,6 +74,9 @@ class ConfigureViewModel @Inject constructor(
             sources = uris.map { ContentByteSource.from(context.contentResolver, it) }
             val first = sources.firstOrNull()
             val items = sources.map { InputItem(displayName = it.displayName ?: "") }
+            val totalBytes = sources.map { it.byteSize }
+                .takeIf { it.isNotEmpty() && it.all { size -> size != null } }
+                ?.sumOf { it!! }
             _state.update { current ->
                 current.copy(
                     input = InputSummary(
@@ -82,6 +85,12 @@ class ConfigureViewModel @Inject constructor(
                         sizeBytes = first?.byteSize,
                         sizeText = first?.byteSize?.let {
                             context.getString(R.string.input_size, formatSize(it))
+                        },
+                        multiCountText = sources.size.takeIf { it > 1 }?.let {
+                            context.getString(R.string.input_multi_count, it)
+                        },
+                        multiSizeText = totalBytes?.takeIf { sources.size > 1 }?.let {
+                            context.getString(R.string.input_multi_size, formatSize(it))
                         },
                         items = items,
                     ),
@@ -163,9 +172,23 @@ class ConfigureViewModel @Inject constructor(
     fun onRemoveImage(index: Int) {
         if (index !in sources.indices) return
         sources = sources.toMutableList().apply { removeAt(index) }
+        val totalBytes = sources.map { it.byteSize }
+            .takeIf { it.isNotEmpty() && it.all { size -> size != null } }
+            ?.sumOf { it!! }
         _state.update { current ->
             val items = current.input.items.toMutableList().apply { removeAt(index) }
-            current.copy(input = current.input.copy(fileCount = items.size, items = items))
+            current.copy(
+                input = current.input.copy(
+                    fileCount = items.size,
+                    items = items,
+                    multiCountText = items.size.takeIf { it > 1 }?.let {
+                        context.getString(R.string.input_multi_count, it)
+                    },
+                    multiSizeText = totalBytes?.takeIf { items.size > 1 }?.let {
+                        context.getString(R.string.input_multi_size, formatSize(it))
+                    },
+                ),
+            )
         }
         revalidate()
     }

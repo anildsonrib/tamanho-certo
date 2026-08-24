@@ -285,8 +285,12 @@ private fun FileSummaryCard(input: InputSummary, accent: ToolAccent) {
                 )
             }
         }
+        // Com mais de um arquivo selecionado, o cartao passa a resumir o
+        // lote inteiro — nome/tamanho do primeiro arquivo, sozinhos, nao
+        // representam a selecao (pedido do responsavel em 2026-08-25).
         Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            input.displayName?.let {
+            val title = input.multiCountText ?: input.displayName
+            title?.let {
                 Text(
                     text = it,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -295,7 +299,8 @@ private fun FileSummaryCard(input: InputSummary, accent: ToolAccent) {
                     lineHeight = 19.sp,
                 )
             }
-            input.sizeText?.let {
+            val subtitle = input.multiCountText?.let { input.multiSizeText } ?: input.sizeText
+            subtitle?.let {
                 Text(
                     text = it,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,

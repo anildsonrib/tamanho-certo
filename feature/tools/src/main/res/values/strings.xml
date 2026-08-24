@@ -28,6 +28,8 @@
     <!-- Resumo da entrada -->
     <string name="input_dimensions">%1$d × %2$d pixels</string>
     <string name="input_size">Tamanho atual: %1$s</string>
+    <string name="input_multi_count">%1$d arquivos selecionados</string>
+    <string name="input_multi_size">Tamanho total: %1$s</string>
 
     <!-- Comprimir -->
     <string name="compress_target_label">Qual o tamanho máximo?</string>

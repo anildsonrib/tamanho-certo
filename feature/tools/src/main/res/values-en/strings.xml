@@ -22,6 +22,8 @@
     <string name="action_compare_hint">Touch and hold to see the original</string>
     <string name="input_dimensions">%1$d × %2$d pixels</string>
     <string name="input_size">Current size: %1$s</string>
+    <string name="input_multi_count">%1$d files selected</string>
+    <string name="input_multi_size">Total size: %1$s</string>
     <string name="compress_target_label">What\'s the size limit?</string>
     <string name="compress_target_hint">Common limit on application forms</string>
     <string name="compress_custom_label">Custom value</string>
