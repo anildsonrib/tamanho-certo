@@ -169,7 +169,8 @@ private fun SelectedFileThumbnail(number: Int, item: InputItem, onRemove: () -> 
 
         // Nome do arquivo, identificado desde a selecao — nao depende da
         // miniatura ja ter carregado (pedido do responsavel em 2026-08-25).
-        // Faixa inferior com scrim para ficar legivel sobre qualquer foto.
+        // Faixa inferior fina, so o suficiente para o texto ficar legivel
+        // sem escurecer a miniatura (ajustado a pedido em 2026-08-25).
         Text(
             text = item.displayName,
             color = androidx.compose.ui.graphics.Color.White,
@@ -181,28 +182,27 @@ private fun SelectedFileThumbnail(number: Int, item: InputItem, onRemove: () -> 
                 .align(Alignment.BottomStart)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
-                .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.45f))
+                .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.22f))
                 .padding(horizontal = 6.dp, vertical = 4.dp),
         )
 
-        // Numero de selecao, centralizado — no canto ele disputava espaco
-        // com o botao de descartar (pedido do responsavel em 2026-08-25).
-        // Scrim atras do numero para continuar legivel sobre foto clara.
-        Box(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .size(ThumbnailBadgeSize)
-                .clip(RoundedCornerShape(50))
-                .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.45f)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = number.toString(),
-                color = androidx.compose.ui.graphics.Color.White,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-            )
-        }
+        // Numero de selecao, centralizado. Sem fundo — o circulo escurecia a
+        // miniatura por baixo; so uma sombra leve no proprio texto mantem a
+        // leitura sem cobrir a foto (ajustado a pedido em 2026-08-25).
+        Text(
+            text = number.toString(),
+            color = androidx.compose.ui.graphics.Color.White,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold,
+            style = androidx.compose.ui.text.TextStyle(
+                shadow = androidx.compose.ui.graphics.Shadow(
+                    color = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.85f),
+                    offset = androidx.compose.ui.geometry.Offset(0f, 1f),
+                    blurRadius = 6f,
+                ),
+            ),
+            modifier = Modifier.align(Alignment.Center),
+        )
 
         // Botao de descartar, no canto superior direito, em vermelho suave
         // (nao saturado) — pedido do responsavel em 2026-08-25.
