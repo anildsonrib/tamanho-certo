@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -110,8 +111,12 @@ fun ConvertScreen(
     }
 }
 
-private val ThumbnailSize = 72.dp
-private val ThumbnailBadgeSize = 22.dp
+// Miniatura em 9:16, independente da proporcao real do arquivo — pedido do
+// responsavel em 2026-08-25, para a grade ficar simetrica mesmo com fotos de
+// proporcoes diferentes.
+private val ThumbnailWidth = 64.dp
+private val ThumbnailHeight = 114.dp // 64 * 16/9
+private val ThumbnailBadgeSize = 24.dp
 
 @Composable
 private fun SelectedFilesGrid(items: List<InputItem>, onRemove: (index: Int) -> Unit) {
@@ -135,10 +140,11 @@ private fun SelectedFilesGrid(items: List<InputItem>, onRemove: (index: Int) -> 
 @Composable
 private fun SelectedFileThumbnail(number: Int, item: InputItem, onRemove: () -> Unit) {
     val shape = RoundedCornerShape(12.dp)
-    Box(modifier = Modifier.size(ThumbnailSize)) {
+    Box(modifier = Modifier.width(ThumbnailWidth).height(ThumbnailHeight)) {
         Box(
             modifier = Modifier
-                .size(ThumbnailSize)
+                .width(ThumbnailWidth)
+                .height(ThumbnailHeight)
                 .clip(shape)
                 .background(MaterialTheme.colorScheme.surfaceContainerHigh, shape)
                 .border(1.dp, MaterialTheme.colorScheme.outlineVariant, shape),
@@ -149,30 +155,32 @@ private fun SelectedFileThumbnail(number: Int, item: InputItem, onRemove: () -> 
                     bitmap = bitmap,
                     contentDescription = item.displayName,
                     contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-                    modifier = Modifier.size(ThumbnailSize).clip(shape),
+                    modifier = Modifier.width(ThumbnailWidth).height(ThumbnailHeight).clip(shape),
                 )
             }
         }
 
-        // Numero de selecao, no canto superior esquerdo.
+        // Numero de selecao, centralizado — no canto ele disputava espaco
+        // com o botao de descartar (pedido do responsavel em 2026-08-25).
+        // Scrim atras do numero para continuar legivel sobre foto clara.
         Box(
             modifier = Modifier
-                .align(Alignment.TopStart)
-                .offset(x = (-6).dp, y = (-6).dp)
+                .align(Alignment.Center)
                 .size(ThumbnailBadgeSize)
                 .clip(RoundedCornerShape(50))
-                .background(MaterialTheme.colorScheme.primary),
+                .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.45f)),
             contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = number.toString(),
-                color = MaterialTheme.colorScheme.onPrimary,
-                fontSize = 11.sp,
+                color = androidx.compose.ui.graphics.Color.White,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
             )
         }
 
-        // Botao de descartar, no canto superior direito.
+        // Botao de descartar, no canto superior direito, em vermelho suave
+        // (nao saturado) — pedido do responsavel em 2026-08-25.
         val removeDescription = stringResource(R.string.action_remove)
         Box(
             modifier = Modifier
@@ -180,8 +188,8 @@ private fun SelectedFileThumbnail(number: Int, item: InputItem, onRemove: () -> 
                 .offset(x = 6.dp, y = (-6).dp)
                 .size(ThumbnailBadgeSize)
                 .clip(RoundedCornerShape(50))
-                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(50))
+                .background(MaterialTheme.colorScheme.errorContainer)
+                .border(1.dp, MaterialTheme.colorScheme.surfaceContainerHigh, RoundedCornerShape(50))
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = ripple(bounded = false),
@@ -194,8 +202,8 @@ private fun SelectedFileThumbnail(number: Int, item: InputItem, onRemove: () -> 
             // material-icons-extended (mesmo padrao de ReorderableImageList.kt).
             Text(
                 text = "✕",
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onErrorContainer,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
             )
         }
