@@ -43,6 +43,7 @@ fun CompressScreen(
     onFormChange: (OperationForm.Compress) -> Unit,
     onSwitchToJpeg: () -> Unit,
     onStart: () -> Unit,
+    onPickFiles: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -52,6 +53,14 @@ fun CompressScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        // Entra direto no layout, sem o seletor do sistema abrir sozinho
+        // (pedido do responsavel em 2026-08-25, mesmo comportamento aplicado
+        // a "Converter formato" antes).
+        if (state.input.fileCount < 1) {
+            EmptySelectionBlock(subtitleRes = R.string.compress_empty_subtitle, onPickFiles = onPickFiles)
+            return@Column
+        }
+
         InputSummaryBlock(state.input)
 
         if (!form.qualityMode) {
@@ -205,6 +214,7 @@ private fun CompressPreview() {
             form = OperationForm.Compress(targetBytes = 500 * KB),
             onFormChange = {},
             onSwitchToJpeg = {},
+            onPickFiles = {},
             onStart = {},
         )
     }
@@ -225,6 +235,7 @@ private fun CompressPngNoticePreview() {
             form = OperationForm.Compress(targetBytes = 100 * KB, format = ImageFormat.PNG),
             onFormChange = {},
             onSwitchToJpeg = {},
+            onPickFiles = {},
             onStart = {},
         )
     }
@@ -241,6 +252,7 @@ private fun CompressBlockedPreview() {
             form = OperationForm.Compress(),
             onFormChange = {},
             onSwitchToJpeg = {},
+            onPickFiles = {},
             onStart = {},
         )
     }

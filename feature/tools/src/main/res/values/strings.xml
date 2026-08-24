@@ -30,8 +30,11 @@
     <string name="input_size">Tamanho atual: %1$s</string>
     <string name="input_multi_count">%1$d arquivos selecionados</string>
     <string name="input_multi_size">Tamanho total: %1$s</string>
+    <string name="input_empty_title">Nenhum arquivo selecionado</string>
+    <string name="action_select_files">Selecionar arquivos</string>
 
     <!-- Comprimir -->
+    <string name="compress_empty_subtitle">Escolha a foto que você quer comprimir</string>
     <string name="compress_target_label">Qual o tamanho máximo?</string>
     <string name="compress_target_hint">Limite comum em formulário de inscrição</string>
     <string name="compress_custom_label">Outro valor</string>
@@ -44,6 +47,7 @@
     <string name="compress_keep_metadata_off">A localização é removida do arquivo enviado</string>
 
     <!-- Redimensionar -->
+    <string name="resize_empty_subtitle">Escolha a foto que você quer redimensionar</string>
     <string name="resize_tab_pixels">Pixels</string>
     <string name="resize_tab_percent">Porcentagem</string>
     <string name="resize_tab_longest">Maior lado</string>
@@ -54,6 +58,7 @@
     <string name="resize_estimate">Tamanho estimado: %1$s</string>
 
     <!-- Imagem para PDF -->
+    <string name="img2pdf_empty_subtitle">Escolha as fotos que você quer juntar em um PDF</string>
     <string name="pdf_page_size">Tamanho da página</string>
     <string name="pdf_page_a4">A4</string>
     <string name="pdf_page_letter">Carta</string>
@@ -70,6 +75,7 @@
     <string name="pdf_reorder_hint">Arraste para reordenar as páginas</string>
 
     <!-- PDF para imagem -->
+    <string name="pdf2img_empty_subtitle">Escolha o PDF que você quer transformar em imagens</string>
     <string name="raster_pages">Páginas</string>
     <string name="raster_pages_all">Todas</string>
     <string name="raster_pages_range">Intervalo</string>
@@ -82,9 +88,7 @@
     <string name="raster_quality_estimate">cerca de %1$s por página</string>
 
     <!-- Converter -->
-    <string name="convert_empty_title">Nenhum arquivo selecionado</string>
     <string name="convert_empty_subtitle">Escolha as imagens que você quer converter</string>
-    <string name="action_select_files">Selecionar arquivos</string>
     <string name="convert_target">Converter para</string>
     <string name="convert_jpeg_hint">Para fotos e anexos pequenos</string>
     <string name="convert_png_hint">Quando não pode perder nada e há transparência</string>

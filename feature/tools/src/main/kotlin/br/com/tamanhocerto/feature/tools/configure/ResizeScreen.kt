@@ -41,6 +41,7 @@ fun ResizeScreen(
     form: OperationForm.Resize,
     onFormChange: (OperationForm.Resize) -> Unit,
     onStart: () -> Unit,
+    onPickFiles: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -50,6 +51,14 @@ fun ResizeScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        // Entra direto no layout, sem o seletor do sistema abrir sozinho
+        // (pedido do responsavel em 2026-08-25, mesmo comportamento aplicado
+        // a "Converter formato" antes).
+        if (state.input.fileCount < 1) {
+            EmptySelectionBlock(subtitleRes = R.string.resize_empty_subtitle, onPickFiles = onPickFiles)
+            return@Column
+        }
+
         InputSummaryBlock(state.input)
 
         TabRow(selectedTabIndex = form.mode.ordinal) {
@@ -161,6 +170,7 @@ private fun ResizePreview() {
             form = OperationForm.Resize(width = "1920", height = "1080"),
             onFormChange = {},
             onStart = {},
+            onPickFiles = {},
         )
     }
 }
@@ -178,6 +188,7 @@ private fun ResizeNoUpscalePreview() {
             ),
             onFormChange = {},
             onStart = {},
+            onPickFiles = {},
         )
     }
 }

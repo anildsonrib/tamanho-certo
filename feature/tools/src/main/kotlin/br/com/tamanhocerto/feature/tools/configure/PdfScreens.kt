@@ -38,6 +38,7 @@ fun ImagesToPdfScreen(
     onMoveImage: (from: Int, to: Int) -> Unit,
     onRemoveImage: (index: Int) -> Unit,
     onStart: () -> Unit,
+    onPickFiles: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -47,6 +48,14 @@ fun ImagesToPdfScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        // Entra direto no layout, sem o seletor do sistema abrir sozinho
+        // (pedido do responsavel em 2026-08-25, mesmo comportamento aplicado
+        // a "Converter formato" antes).
+        if (state.input.fileCount < 1) {
+            EmptySelectionBlock(subtitleRes = R.string.img2pdf_empty_subtitle, onPickFiles = onPickFiles)
+            return@Column
+        }
+
         InputSummaryBlock(state.input)
         Text(
             text = stringResource(R.string.pdf_reorder_hint),
@@ -127,6 +136,7 @@ fun PdfToImagesScreen(
     form: OperationForm.PdfToImages,
     onFormChange: (OperationForm.PdfToImages) -> Unit,
     onStart: () -> Unit,
+    onPickFiles: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -136,6 +146,14 @@ fun PdfToImagesScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        // Entra direto no layout, sem o seletor do sistema abrir sozinho
+        // (pedido do responsavel em 2026-08-25, mesmo comportamento aplicado
+        // a "Converter formato" antes).
+        if (state.input.fileCount < 1) {
+            EmptySelectionBlock(subtitleRes = R.string.pdf2img_empty_subtitle, onPickFiles = onPickFiles)
+            return@Column
+        }
+
         InputSummaryBlock(state.input)
 
         Text(
@@ -260,6 +278,7 @@ private fun ImagesToPdfPreview() {
             onMoveImage = { _, _ -> },
             onRemoveImage = {},
             onStart = {},
+            onPickFiles = {},
         )
     }
 }
@@ -275,6 +294,7 @@ private fun PdfToImagesBlockedPreview() {
             form = OperationForm.PdfToImages(allPages = false, from = "2", to = "9"),
             onFormChange = {},
             onStart = {},
+            onPickFiles = {},
         )
     }
 }

@@ -1,12 +1,10 @@
 package br.com.tamanhocerto.feature.tools.configure
 
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -29,7 +27,6 @@ import br.com.tamanhocerto.core.ui.R as UiR
  */
 @Composable
 fun ConfigureRoute(
-    uris: List<Uri>,
     onBack: () -> Unit,
     onHome: () -> Unit,
     modifier: Modifier = Modifier,
@@ -39,14 +36,16 @@ fun ConfigureRoute(
     val result by viewModel.result.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    LaunchedEffect(uris) { if (uris.isNotEmpty()) viewModel.onInputSelected(uris) }
-
-    // So a tela de Converter entra vazia e pede o arquivo por dentro do
-    // proprio layout (pedido do responsavel em 2026-08-25) — as outras
-    // quatro continuam recebendo a selecao pronta, feita em `home`.
+    // As cinco ferramentas entram direto no proprio layout e pedem o arquivo
+    // por dentro dele (pedido do responsavel em 2026-08-25, revertendo o
+    // gesto unico de UI-SPEC secao 3 para todas — comecou so em Converter).
     val pickImagesLauncher = rememberLauncherForActivityResult(
         PickerContracts.pickImages(),
     ) { picked -> if (picked.isNotEmpty()) viewModel.onInputSelected(picked) }
+
+    val pickPdfLauncher = rememberLauncherForActivityResult(
+        PickerContracts.openPdf(),
+    ) { picked -> if (picked != null) viewModel.onInputSelected(listOf(picked)) }
 
     val saveLauncher = rememberLauncherForActivityResult(
         contract = PickerContracts.createDocument(
@@ -109,6 +108,7 @@ fun ConfigureRoute(
                         viewModel.onFormChanged(form.copy(format = ImageFormat.JPEG))
                     },
                     onStart = { viewModel.onStart() },
+                    onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
                     modifier = content,
                 )
 
@@ -117,6 +117,7 @@ fun ConfigureRoute(
                     form = form,
                     onFormChange = viewModel::onFormChanged,
                     onStart = { viewModel.onStart() },
+                    onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
                     modifier = content,
                 )
 
@@ -127,6 +128,7 @@ fun ConfigureRoute(
                     onMoveImage = viewModel::onReorderImages,
                     onRemoveImage = viewModel::onRemoveImage,
                     onStart = { viewModel.onStart() },
+                    onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
                     modifier = content,
                 )
 
@@ -135,6 +137,7 @@ fun ConfigureRoute(
                     form = form,
                     onFormChange = viewModel::onFormChanged,
                     onStart = { viewModel.onStart() },
+                    onPickFiles = { pickPdfLauncher.launch(PickerContracts.PDF_MIME_FILTER) },
                     modifier = content,
                 )
 

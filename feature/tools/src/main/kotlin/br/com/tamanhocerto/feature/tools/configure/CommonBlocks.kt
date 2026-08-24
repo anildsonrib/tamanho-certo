@@ -3,13 +3,16 @@ package br.com.tamanhocerto.feature.tools.configure
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import br.com.tamanhocerto.core.model.ImageFormat
 import br.com.tamanhocerto.core.ui.component.NoticeKind
+import br.com.tamanhocerto.core.ui.component.PrimaryAction
 import br.com.tamanhocerto.core.ui.component.SizeChip
 import br.com.tamanhocerto.feature.tools.R
 import br.com.tamanhocerto.feature.tools.home.ToolId
@@ -24,6 +27,31 @@ fun InputSummaryBlock(input: InputSummary) {
         }
         input.sizeText?.let { Text(text = it, style = MaterialTheme.typography.bodySmall) }
         input.pagesText?.let { Text(text = it, style = MaterialTheme.typography.bodySmall) }
+    }
+}
+
+/**
+ * Estado sem arquivo selecionado ainda: as cinco ferramentas entram direto no
+ * proprio layout (pedido do responsavel em 2026-08-25, revertendo o gesto
+ * unico da UI-SPEC secao 3 para todas) — este bloco convida a escolher em vez
+ * de mostrar controles vazios.
+ */
+@Composable
+fun EmptySelectionBlock(subtitleRes: Int, onPickFiles: () -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = stringResource(R.string.input_empty_title),
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Text(
+            text = stringResource(subtitleRes),
+            style = MaterialTheme.typography.bodySmall,
+        )
+        PrimaryAction(
+            text = stringResource(R.string.action_select_files),
+            onClick = onPickFiles,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 

@@ -147,7 +147,7 @@ private fun EmptySelectionCard(accent: ToolAccent, onPickFiles: () -> Unit) {
             )
         }
         Text(
-            text = stringResource(R.string.convert_empty_title),
+            text = stringResource(R.string.input_empty_title),
             color = MaterialTheme.colorScheme.onSurface,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
