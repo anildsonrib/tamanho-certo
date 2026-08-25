@@ -109,6 +109,7 @@ fun ConfigureRoute(
                     },
                     onStart = { viewModel.onStart() },
                     onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
+                    onClearAll = viewModel::onClearAll,
                     modifier = content,
                 )
 
@@ -118,6 +119,7 @@ fun ConfigureRoute(
                     onFormChange = viewModel::onFormChanged,
                     onStart = { viewModel.onStart() },
                     onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
+                    onClearAll = viewModel::onClearAll,
                     modifier = content,
                 )
 
@@ -129,6 +131,7 @@ fun ConfigureRoute(
                     onRemoveImage = viewModel::onRemoveImage,
                     onStart = { viewModel.onStart() },
                     onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
+                    onClearAll = viewModel::onClearAll,
                     modifier = content,
                 )
 
@@ -138,6 +141,7 @@ fun ConfigureRoute(
                     onFormChange = viewModel::onFormChanged,
                     onStart = { viewModel.onStart() },
                     onPickFiles = { pickPdfLauncher.launch(PickerContracts.PDF_MIME_FILTER) },
+                    onClearAll = viewModel::onClearAll,
                     modifier = content,
                 )
 
@@ -148,6 +152,7 @@ fun ConfigureRoute(
                     onRemoveFile = viewModel::onRemoveImage,
                     onStart = { viewModel.onStart() },
                     onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
+                    onClearAll = viewModel::onClearAll,
                     modifier = content,
                 )
             }
@@ -166,4 +171,13 @@ internal fun ToolId.titleRes(): Int = when (this) {
     ToolId.IMAGES_TO_PDF -> R.string.tool_img2pdf_title
     ToolId.PDF_TO_IMAGES -> R.string.tool_pdf2img_title
     ToolId.CONVERT -> R.string.tool_convert_title
+}
+
+/** Rotulo do botao de acao quando ha arquivo selecionado — verbo por ferramenta. */
+internal fun ToolId.actionRes(): Int = when (this) {
+    ToolId.COMPRESS -> R.string.compress_action
+    ToolId.RESIZE -> R.string.resize_action
+    ToolId.IMAGES_TO_PDF -> R.string.img2pdf_action
+    ToolId.PDF_TO_IMAGES -> R.string.pdf2img_action
+    ToolId.CONVERT -> R.string.convert_action
 }

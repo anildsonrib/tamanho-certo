@@ -193,6 +193,17 @@ class ConfigureViewModel @Inject constructor(
         revalidate()
     }
 
+    /**
+     * Limpa a selecao inteira (botao "Limpar", com confirmacao na tela —
+     * pedido do responsavel em 2026-08-25). A tela volta ao estado sem
+     * arquivo, com o mesmo formulario de antes.
+     */
+    fun onClearAll() {
+        sources = emptyList()
+        _state.update { current -> current.copy(input = InputSummary()) }
+        revalidate()
+    }
+
     fun onFormChanged(form: OperationForm) {
         _state.update { it.copy(form = form) }
         revalidate()

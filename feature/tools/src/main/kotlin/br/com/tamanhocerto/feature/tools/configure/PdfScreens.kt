@@ -24,7 +24,6 @@ import br.com.tamanhocerto.core.model.PageSize
 import br.com.tamanhocerto.core.model.RenderDensity
 import br.com.tamanhocerto.core.ui.component.NoticeCard
 import br.com.tamanhocerto.core.ui.component.NoticeKind
-import br.com.tamanhocerto.core.ui.component.PrimaryAction
 import br.com.tamanhocerto.core.ui.component.SizeChip
 import br.com.tamanhocerto.core.ui.theme.TamanhoCertoTheme
 import br.com.tamanhocerto.feature.tools.R
@@ -39,6 +38,7 @@ fun ImagesToPdfScreen(
     onRemoveImage: (index: Int) -> Unit,
     onStart: () -> Unit,
     onPickFiles: () -> Unit,
+    onClearAll: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -48,14 +48,8 @@ fun ImagesToPdfScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        // Entra direto no layout, sem o seletor do sistema abrir sozinho
-        // (pedido do responsavel em 2026-08-25, mesmo comportamento aplicado
-        // a "Converter formato" antes).
-        if (state.input.fileCount < 1) {
-            EmptySelectionBlock(subtitleRes = R.string.img2pdf_empty_subtitle, onPickFiles = onPickFiles)
-            return@Column
-        }
-
+        // Entra direto no layout, sem tela intermediaria e sem o seletor do
+        // sistema abrir sozinho (pedido do responsavel em 2026-08-25).
         InputSummaryBlock(state.input)
         Text(
             text = stringResource(R.string.pdf_reorder_hint),
@@ -121,11 +115,13 @@ fun ImagesToPdfScreen(
             NoticeCard(text = blockedText(it), kind = NoticeKind.ERROR)
         }
 
-        PrimaryAction(
-            text = stringResource(R.string.action_continue),
-            onClick = onStart,
-            enabled = state.validation is Validation.Ok,
-            modifier = Modifier.fillMaxWidth(),
+        ToolActionBar(
+            hasFiles = state.input.fileCount >= 1,
+            actionLabel = stringResource(state.tool.actionRes()),
+            actionEnabled = state.validation is Validation.Ok,
+            onPickFiles = onPickFiles,
+            onStart = onStart,
+            onClearAll = onClearAll,
         )
     }
 }
@@ -137,6 +133,7 @@ fun PdfToImagesScreen(
     onFormChange: (OperationForm.PdfToImages) -> Unit,
     onStart: () -> Unit,
     onPickFiles: () -> Unit,
+    onClearAll: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -146,14 +143,8 @@ fun PdfToImagesScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        // Entra direto no layout, sem o seletor do sistema abrir sozinho
-        // (pedido do responsavel em 2026-08-25, mesmo comportamento aplicado
-        // a "Converter formato" antes).
-        if (state.input.fileCount < 1) {
-            EmptySelectionBlock(subtitleRes = R.string.pdf2img_empty_subtitle, onPickFiles = onPickFiles)
-            return@Column
-        }
-
+        // Entra direto no layout, sem tela intermediaria e sem o seletor do
+        // sistema abrir sozinho (pedido do responsavel em 2026-08-25).
         InputSummaryBlock(state.input)
 
         Text(
@@ -215,11 +206,13 @@ fun PdfToImagesScreen(
             NoticeCard(text = blockedText(it), kind = NoticeKind.ERROR)
         }
 
-        PrimaryAction(
-            text = stringResource(R.string.action_continue),
-            onClick = onStart,
-            enabled = state.validation is Validation.Ok,
-            modifier = Modifier.fillMaxWidth(),
+        ToolActionBar(
+            hasFiles = state.input.fileCount >= 1,
+            actionLabel = stringResource(state.tool.actionRes()),
+            actionEnabled = state.validation is Validation.Ok,
+            onPickFiles = onPickFiles,
+            onStart = onStart,
+            onClearAll = onClearAll,
         )
     }
 }
@@ -279,6 +272,7 @@ private fun ImagesToPdfPreview() {
             onRemoveImage = {},
             onStart = {},
             onPickFiles = {},
+            onClearAll = {},
         )
     }
 }
@@ -295,6 +289,7 @@ private fun PdfToImagesBlockedPreview() {
             onFormChange = {},
             onStart = {},
             onPickFiles = {},
+            onClearAll = {},
         )
     }
 }

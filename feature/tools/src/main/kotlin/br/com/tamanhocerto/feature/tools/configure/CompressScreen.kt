@@ -44,6 +44,7 @@ fun CompressScreen(
     onSwitchToJpeg: () -> Unit,
     onStart: () -> Unit,
     onPickFiles: () -> Unit,
+    onClearAll: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -53,14 +54,11 @@ fun CompressScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        // Entra direto no layout, sem o seletor do sistema abrir sozinho
-        // (pedido do responsavel em 2026-08-25, mesmo comportamento aplicado
-        // a "Converter formato" antes).
-        if (state.input.fileCount < 1) {
-            EmptySelectionBlock(subtitleRes = R.string.compress_empty_subtitle, onPickFiles = onPickFiles)
-            return@Column
-        }
-
+        // Entra direto no layout, sem tela intermediaria e sem o seletor do
+        // sistema abrir sozinho (pedido do responsavel em 2026-08-25). Com a
+        // area de arquivos vazia, o resumo mostra "Nenhum arquivo
+        // selecionado" (InputSummaryBlock) e o botao de baixo vira
+        // "Selecionar arquivos" (ToolActionBar).
         InputSummaryBlock(state.input)
 
         if (!form.qualityMode) {
@@ -130,11 +128,13 @@ fun CompressScreen(
             NoticeCard(text = blockedText(blocked), kind = NoticeKind.ERROR)
         }
 
-        PrimaryAction(
-            text = stringResource(R.string.action_continue),
-            onClick = onStart,
-            enabled = state.validation is Validation.Ok,
-            modifier = Modifier.fillMaxWidth(),
+        ToolActionBar(
+            hasFiles = state.input.fileCount >= 1,
+            actionLabel = stringResource(state.tool.actionRes()),
+            actionEnabled = state.validation is Validation.Ok,
+            onPickFiles = onPickFiles,
+            onStart = onStart,
+            onClearAll = onClearAll,
         )
     }
 }
@@ -215,6 +215,7 @@ private fun CompressPreview() {
             onFormChange = {},
             onSwitchToJpeg = {},
             onPickFiles = {},
+            onClearAll = {},
             onStart = {},
         )
     }
@@ -236,6 +237,7 @@ private fun CompressPngNoticePreview() {
             onFormChange = {},
             onSwitchToJpeg = {},
             onPickFiles = {},
+            onClearAll = {},
             onStart = {},
         )
     }
@@ -253,6 +255,7 @@ private fun CompressBlockedPreview() {
             onFormChange = {},
             onSwitchToJpeg = {},
             onPickFiles = {},
+            onClearAll = {},
             onStart = {},
         )
     }

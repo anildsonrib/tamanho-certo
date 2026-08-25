@@ -11,7 +11,6 @@
     <string name="tool_pdf2img_sub">Save PDF pages as pictures</string>
     <string name="tool_convert_title">Convert format</string>
     <string name="tool_convert_sub">Switch between JPEG, PNG and WebP</string>
-    <string name="action_continue">Continue</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>
     <string name="action_share">Share</string>
@@ -20,13 +19,21 @@
     <string name="action_advanced">Advanced options</string>
     <string name="action_details">Details</string>
     <string name="action_compare_hint">Touch and hold to see the original</string>
+    <string name="action_select_files">Select files</string>
+    <string name="action_clear">Clear</string>
+    <string name="clear_confirm_title">Clear the selected files?</string>
+    <string name="clear_confirm_body">The files aren\'t deleted from your device, only the selection on this screen.</string>
+    <string name="clear_confirm_yes">Clear</string>
     <string name="input_dimensions">%1$d × %2$d pixels</string>
     <string name="input_size">Current size: %1$s</string>
     <string name="input_multi_count">%1$d files selected</string>
     <string name="input_multi_size">Total size: %1$s</string>
     <string name="input_empty_title">No files selected</string>
-    <string name="action_select_files">Select files</string>
-    <string name="compress_empty_subtitle">Choose the photo you want to compress</string>
+    <string name="compress_action">Compress</string>
+    <string name="resize_action">Resize</string>
+    <string name="img2pdf_action">Create PDF</string>
+    <string name="pdf2img_action">Extract images</string>
+    <string name="convert_action">Convert</string>
     <string name="compress_target_label">What\'s the size limit?</string>
     <string name="compress_target_hint">Common limit on application forms</string>
     <string name="compress_custom_label">Custom value</string>
@@ -37,7 +44,6 @@
     <string name="compress_quality_mode">Use quality instead of size</string>
     <string name="compress_keep_metadata">Keep photo data (location and camera)</string>
     <string name="compress_keep_metadata_off">Location is removed from the exported file</string>
-    <string name="resize_empty_subtitle">Choose the photo you want to resize</string>
     <string name="resize_tab_pixels">Pixels</string>
     <string name="resize_tab_percent">Percentage</string>
     <string name="resize_tab_longest">Longest side</string>
@@ -46,7 +52,6 @@
     <string name="resize_lock">Keep proportions</string>
     <string name="resize_result">Result: %1$d × %2$d pixels</string>
     <string name="resize_estimate">Estimated size: %1$s</string>
-    <string name="img2pdf_empty_subtitle">Choose the photos you want to combine into a PDF</string>
     <string name="pdf_page_size">Page size</string>
     <string name="pdf_page_a4">A4</string>
     <string name="pdf_page_letter">Letter</string>
@@ -61,7 +66,6 @@
     <string name="pdf_margin_medium">Medium</string>
     <string name="pdf_target">Limit the PDF size</string>
     <string name="pdf_reorder_hint">Drag to reorder pages</string>
-    <string name="pdf2img_empty_subtitle">Choose the PDF you want to turn into images</string>
     <string name="raster_pages">Pages</string>
     <string name="raster_pages_all">All</string>
     <string name="raster_pages_range">Range</string>
@@ -72,7 +76,6 @@
     <string name="raster_quality_medium">Medium</string>
     <string name="raster_quality_high">High</string>
     <string name="raster_quality_estimate">about %1$s per page</string>
-    <string name="convert_empty_subtitle">Choose the images you want to convert</string>
     <string name="convert_target">Convert to</string>
     <string name="convert_jpeg_hint">For photos and small attachments</string>
     <string name="convert_png_hint">When nothing can be lost and there\'s transparency</string>

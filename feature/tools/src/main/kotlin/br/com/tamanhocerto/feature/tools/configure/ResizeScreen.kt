@@ -23,7 +23,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import br.com.tamanhocerto.core.ui.component.NoticeCard
 import br.com.tamanhocerto.core.ui.component.NoticeKind
-import br.com.tamanhocerto.core.ui.component.PrimaryAction
 import br.com.tamanhocerto.core.ui.component.SizeChip
 import br.com.tamanhocerto.core.ui.theme.TamanhoCertoTheme
 import br.com.tamanhocerto.feature.tools.R
@@ -42,6 +41,7 @@ fun ResizeScreen(
     onFormChange: (OperationForm.Resize) -> Unit,
     onStart: () -> Unit,
     onPickFiles: () -> Unit,
+    onClearAll: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -51,14 +51,8 @@ fun ResizeScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        // Entra direto no layout, sem o seletor do sistema abrir sozinho
-        // (pedido do responsavel em 2026-08-25, mesmo comportamento aplicado
-        // a "Converter formato" antes).
-        if (state.input.fileCount < 1) {
-            EmptySelectionBlock(subtitleRes = R.string.resize_empty_subtitle, onPickFiles = onPickFiles)
-            return@Column
-        }
-
+        // Entra direto no layout, sem tela intermediaria e sem o seletor do
+        // sistema abrir sozinho (pedido do responsavel em 2026-08-25).
         InputSummaryBlock(state.input)
 
         TabRow(selectedTabIndex = form.mode.ordinal) {
@@ -146,11 +140,13 @@ fun ResizeScreen(
             onSelect = { onFormChange(form.copy(format = it)) },
         )
 
-        PrimaryAction(
-            text = stringResource(R.string.action_continue),
-            onClick = onStart,
-            enabled = state.validation is Validation.Ok,
-            modifier = Modifier.fillMaxWidth(),
+        ToolActionBar(
+            hasFiles = state.input.fileCount >= 1,
+            actionLabel = stringResource(state.tool.actionRes()),
+            actionEnabled = state.validation is Validation.Ok,
+            onPickFiles = onPickFiles,
+            onStart = onStart,
+            onClearAll = onClearAll,
         )
     }
 }
@@ -171,6 +167,7 @@ private fun ResizePreview() {
             onFormChange = {},
             onStart = {},
             onPickFiles = {},
+            onClearAll = {},
         )
     }
 }
@@ -189,6 +186,7 @@ private fun ResizeNoUpscalePreview() {
             onFormChange = {},
             onStart = {},
             onPickFiles = {},
+            onClearAll = {},
         )
     }
 }
