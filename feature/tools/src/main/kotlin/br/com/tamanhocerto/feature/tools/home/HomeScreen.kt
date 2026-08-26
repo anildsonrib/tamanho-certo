@@ -140,9 +140,13 @@ fun HomeScreen(
                         ToolCardFor(3, accents, onToolClick, Modifier.weight(1f).fillMaxHeight())
                     }
                     // Quinto cartao ("Converter formato") ocupa a largura
-                    // toda, em formato horizontal — `.card.full` no HTML de
-                    // referencia.
-                    ToolCardFor(4, accents, onToolClick, Modifier.fillMaxWidth(), horizontal = true)
+                    // toda, mas com o mesmo layout vertical dos outros
+                    // quatro (icone em cima, titulo e descricao embaixo) —
+                    // pedido do responsavel em 2026-08-26: o layout
+                    // horizontal (`.card.full` do HTML de referencia)
+                    // deixava o texto ao lado do icone e o cartao mais
+                    // baixo que os outros, quebrando a simetria.
+                    ToolCardFor(4, accents, onToolClick, Modifier.fillMaxWidth())
                 }
             }
 
@@ -208,7 +212,6 @@ private fun ToolCardFor(
     accents: List<ToolAccent>,
     onToolClick: (ToolId) -> Unit,
     modifier: Modifier,
-    horizontal: Boolean = false,
 ) {
     val (id, texts) = TOOLS[index]
     val (titleRes, subRes, icon) = texts
@@ -219,6 +222,5 @@ private fun ToolCardFor(
         accent = accents[index],
         onClick = { onToolClick(id) },
         modifier = modifier,
-        horizontal = horizontal,
     )
 }

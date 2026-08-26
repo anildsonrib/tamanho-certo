@@ -11,14 +11,12 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -52,7 +50,6 @@ import br.com.tamanhocerto.core.ui.theme.ToolAccent
 // esticado para preencher um terco da altura disponivel — foi isso que
 // deixou o cartao alto demais com vao vazio sobrando abaixo do texto.
 private val CardMinHeight = 148.dp
-private val CardMinHeightFull = 96.dp
 private val CardRadius = 18.dp
 private val IconBadgeSize = 46.dp
 private val IconBadgeRadius = 11.dp
@@ -70,9 +67,12 @@ private const val PRESS_ANIMATION_MS = 150
  * `HomePalette` em vez do esquema dinamico do Material 3 (divergencia
  * registrada em `TASKS.md`).
  *
- * `horizontal = true` reproduz o quinto cartao ("Converter formato"),
- * que ocupa a largura toda com icone a esquerda, texto ao centro e
- * chevron a direita (`.card.full` no HTML de referencia).
+ * Mesmo layout vertical (icone em cima, titulo e descricao embaixo) para
+ * as cinco ferramentas, inclusive o quinto cartao ("Converter formato"),
+ * que so difere por ocupar a largura toda — o layout horizontal do
+ * `.card.full` do HTML de referencia foi descartado a pedido do
+ * responsavel em 2026-08-26: deixava o texto ao lado do icone e o cartao
+ * mais baixo que os outros, quebrando a simetria da grade.
  */
 @Composable
 fun ToolCard(
@@ -82,7 +82,6 @@ fun ToolCard(
     accent: ToolAccent,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    horizontal: Boolean = false,
 ) {
     val palette = if (isSystemInDarkTheme()) HomePaletteDark else HomePaletteLight
     val interactionSource = remember { MutableInteractionSource() }
@@ -95,7 +94,7 @@ fun ToolCard(
     val shape = RoundedCornerShape(CardRadius)
 
     val cardModifier = modifier
-        .defaultMinSize(minHeight = if (horizontal) CardMinHeightFull else CardMinHeight)
+        .defaultMinSize(minHeight = CardMinHeight)
         .graphicsLayer { scaleX = scale; scaleY = scale }
         .clip(shape)
         .background(palette.surface, shape)
@@ -107,43 +106,24 @@ fun ToolCard(
         )
         .semantics { contentDescription = "$title. $subtitle" }
 
-    if (horizontal) {
-        Row(
-            modifier = cardModifier
+    Box(modifier = cardModifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, top = 14.dp, end = 16.dp, bottom = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
+                .padding(start = 16.dp, top = 14.dp, end = 16.dp, bottom = 12.dp),
         ) {
             ToolIconBadge(icon, accent)
-            Spacer(Modifier.width(14.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                CardTitle(title, palette.text)
-                Spacer(Modifier.height(4.dp))
-                CardSubtitle(subtitle, palette.textSoft)
-            }
-            Spacer(Modifier.width(8.dp))
-            Chevron(tint = palette.textSoft)
+            Spacer(Modifier.height(10.dp))
+            CardTitle(title, palette.text)
+            Spacer(Modifier.height(4.dp))
+            CardSubtitle(subtitle, palette.textSoft)
         }
-    } else {
-        Box(modifier = cardModifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, top = 14.dp, end = 16.dp, bottom = 12.dp),
-            ) {
-                ToolIconBadge(icon, accent)
-                Spacer(Modifier.height(10.dp))
-                CardTitle(title, palette.text)
-                Spacer(Modifier.height(4.dp))
-                CardSubtitle(subtitle, palette.textSoft)
-            }
-            Chevron(
-                tint = palette.textSoft,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 14.dp, bottom = 12.dp),
-            )
-        }
+        Chevron(
+            tint = palette.textSoft,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 14.dp, bottom = 12.dp),
+        )
     }
 }
 
