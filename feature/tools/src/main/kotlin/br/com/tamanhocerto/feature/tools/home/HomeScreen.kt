@@ -3,9 +3,12 @@ package br.com.tamanhocerto.feature.tools.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,7 +24,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.layout.BoxWithConstraints
 import br.com.tamanhocerto.core.ui.component.AppScaffold
 import br.com.tamanhocerto.core.ui.component.NavIconAbout
 import br.com.tamanhocerto.core.ui.component.NavIconPrivacy
@@ -52,16 +54,15 @@ private val TOOLS = listOf(
 )
 
 // Metricas da referencia visual aprovada em 2026-08-26 (`preview(1).html`,
-// estilo CamScanner). Ajustadas no mesmo dia (pedido do responsavel): os
-// quatro primeiros cartoes usam proporcao 3:4 (largura:altura), o quinto
-// tem a mesma altura dos outros mas ocupa a largura toda (como se fossem
-// dois cartoes juntos), e a largura/altura de cada um e calculada a partir
-// do espaco realmente disponivel (`GridArea` abaixo) para que as cinco
-// ferramentas cabam na tela sem rolagem e sem sobra, em qualquer aparelho.
+// estilo CamScanner), recalibradas no mesmo dia por comparacao visual
+// direta com uma captura de referencia do proprio emulador. A largura do
+// cartao vem da divisao igual do espaco disponivel (`weight(1f)`); a
+// altura e guiada pelo conteudo (piso em `ToolCard`), nao forcada a
+// preencher um terco do espaco vertical — foi essa forca que deixou os
+// cartoes altos demais, com vao vazio sobrando abaixo do texto.
 private val PagePadding = 20.dp
-private val Gap = 10.dp
-private val HeaderTopPadding = 8.dp
-private const val CardAspectWidthToHeight = 3f / 4f
+private val Gap = 12.dp
+private val HeaderTopPadding = 16.dp
 
 @Composable
 fun HomeScreen(
@@ -93,65 +94,55 @@ fun HomeScreen(
                 Text(
                     text = stringResource(R.string.home_title),
                     color = palette.text,
-                    fontSize = 24.sp,
+                    fontSize = 26.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    lineHeight = 28.sp,
+                    lineHeight = 30.sp,
                     letterSpacing = (-0.6).sp,
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = stringResource(R.string.home_subtitle),
                     color = palette.textSoft,
-                    fontSize = 14.sp,
-                    lineHeight = 19.sp,
+                    fontSize = 15.sp,
+                    lineHeight = 20.sp,
                 )
             }
 
-            // Area da grade: ocupa exatamente o espaco que sobra entre o
-            // cabecalho e o rodape (`weight(1f)`), nunca mais nem menos —
-            // e o que garante caber as cinco ferramentas sem rolagem e sem
-            // sobra em qualquer altura de tela. Dentro dela, `cellWidth` e
-            // calculado tanto pela largura quanto pela altura disponiveis
-            // (o menor dos dois vence, como um "contain") para que os
-            // quatro primeiros cartoes fiquem exatamente 3:4 sem estourar
-            // nenhum dos dois eixos.
-            BoxWithConstraints(
+            // Area da grade: ocupa o espaco que sobra entre o cabecalho e o
+            // rodape (`weight(1f)`) — cabecalho e rodape sao medidos
+            // primeiro pelo Column, entao a grade nunca invade nenhum dos
+            // dois. Dentro dela, os cartoes tem altura guiada pelo proprio
+            // conteudo (piso em `ToolCard`, simetrico entre os dois de cada
+            // linha via `IntrinsicSize.Max`), e o bloco inteiro fica
+            // centralizado no espaco disponivel — cabe as cinco
+            // ferramentas sem rolagem em qualquer altura de tela, sem
+            // esticar os cartoes para preencher espaco a mais.
+            Box(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .padding(horizontal = PagePadding, vertical = 10.dp),
+                    .padding(horizontal = PagePadding, vertical = 8.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                val cellWidthFromWidth = (maxWidth - Gap) / 2
-                val cardHeightFromHeight = (maxHeight - Gap * 2) / 3
-                val cellWidthFromHeight = cardHeightFromHeight * CardAspectWidthToHeight
-                val cellWidth = minOf(cellWidthFromWidth, cellWidthFromHeight)
-                val cardHeight = cellWidth / CardAspectWidthToHeight
-                val gridWidth = cellWidth * 2 + Gap
-
-                Column(
-                    modifier = Modifier.width(gridWidth),
-                    verticalArrangement = Arrangement.spacedBy(Gap),
-                ) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(Gap)) {
-                        ToolCardFor(0, accents, onToolClick, Modifier.width(cellWidth).height(cardHeight))
-                        ToolCardFor(1, accents, onToolClick, Modifier.width(cellWidth).height(cardHeight))
+                Column(verticalArrangement = Arrangement.spacedBy(Gap)) {
+                    Row(
+                        modifier = Modifier.height(IntrinsicSize.Max),
+                        horizontalArrangement = Arrangement.spacedBy(Gap),
+                    ) {
+                        ToolCardFor(0, accents, onToolClick, Modifier.weight(1f).fillMaxHeight())
+                        ToolCardFor(1, accents, onToolClick, Modifier.weight(1f).fillMaxHeight())
                     }
-                    Row(horizontalArrangement = Arrangement.spacedBy(Gap)) {
-                        ToolCardFor(2, accents, onToolClick, Modifier.width(cellWidth).height(cardHeight))
-                        ToolCardFor(3, accents, onToolClick, Modifier.width(cellWidth).height(cardHeight))
+                    Row(
+                        modifier = Modifier.height(IntrinsicSize.Max),
+                        horizontalArrangement = Arrangement.spacedBy(Gap),
+                    ) {
+                        ToolCardFor(2, accents, onToolClick, Modifier.weight(1f).fillMaxHeight())
+                        ToolCardFor(3, accents, onToolClick, Modifier.weight(1f).fillMaxHeight())
                     }
-                    // Quinto cartao ("Converter formato"): mesma altura dos
-                    // outros quatro, mas ocupa a largura toda da grade —
-                    // como se fossem dois cartoes lado a lado — em formato
-                    // horizontal (`.card.full` no HTML de referencia).
-                    ToolCardFor(
-                        4,
-                        accents,
-                        onToolClick,
-                        Modifier.width(gridWidth).height(cardHeight),
-                        horizontal = true,
-                    )
+                    // Quinto cartao ("Converter formato") ocupa a largura
+                    // toda, em formato horizontal — `.card.full` no HTML de
+                    // referencia.
+                    ToolCardFor(4, accents, onToolClick, Modifier.fillMaxWidth(), horizontal = true)
                 }
             }
 
