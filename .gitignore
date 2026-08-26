@@ -28,3 +28,15 @@ Thumbs.db
 
 # Capturas de tela coladas em conversa (podem conter dado pessoal, ex.: CPF).
 /midia/
+
+# Documentacao de construcao do sistema — detalha arquitetura, decisoes e
+# protocolo de trabalho; o responsavel optou por nao versionar (2026-08-25).
+# Continua existindo em disco para o CLI carregar normalmente; so nao vai
+# mais para o git.
+/AGENTS.md
+/README.md
+/HANDOFF.md
+/TASKS.md
+/IMPLEMENTATION_PLAN.md
+/BACKLOG.md
+/docs/
