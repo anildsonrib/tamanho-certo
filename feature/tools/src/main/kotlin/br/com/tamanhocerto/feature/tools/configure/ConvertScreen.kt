@@ -41,6 +41,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.com.tamanhocerto.core.model.ImageFormat
+import br.com.tamanhocerto.core.ui.component.ActionIconFolder
+import br.com.tamanhocerto.core.ui.component.FormatIconFile
+import br.com.tamanhocerto.core.ui.component.FormatIconPhoto
 import br.com.tamanhocerto.core.ui.component.ToolIconFileImage
 import br.com.tamanhocerto.core.ui.theme.TamanhoCertoTheme
 import br.com.tamanhocerto.core.ui.theme.ToolAccent
@@ -105,6 +108,7 @@ fun ConvertScreen(
                 onPickFiles = onPickFiles,
                 onStart = onStart,
                 onClearAll = onClearAll,
+                selectFilesIcon = ActionIconFolder,
             )
 
             // Miniaturas dos arquivos selecionados, na area vazia abaixo do
@@ -265,30 +269,15 @@ private fun FileSummaryCard(input: InputSummary, accent: ToolAccent) {
                 .background(accent.soft),
             contentAlignment = Alignment.Center,
         ) {
+            // Icone de pagina com dobra no canto (referencia visual aprovada
+            // em 2026-08-26, mockup enviado pelo responsavel) — sem o
+            // emblema de destaque separado que havia antes no canto.
             Icon(
                 imageVector = ToolIconFileImage,
                 contentDescription = null,
                 tint = accent.color,
                 modifier = Modifier.size(26.dp),
             )
-            // Pequeno detalhe de destaque no canto, com o anel na cor do
-            // cartao (referencia visual: `box-shadow: 0 0 0 3px var(--surface)`).
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .offset(x = 6.dp, y = 6.dp)
-                    .size(20.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(MaterialTheme.colorScheme.surfaceContainer),
-                contentAlignment = Alignment.Center,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(14.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(accent.color),
-                )
-            }
         }
         // Com mais de um arquivo selecionado, o cartao passa a resumir o
         // lote inteiro — nome/tamanho do primeiro arquivo, sozinhos, nao
@@ -347,6 +336,9 @@ private fun FormatCard(
             // Ordem = ImageFormat.entries (JPEG, PNG, WEBP), mesma da
             // referencia; as tres cores de destaque sao as mesmas ja usadas
             // pelos cartoes da `home` (indices 3=azul, 2=verde, 4=roxo).
+            // Icone por chip, referencia visual aprovada em 2026-08-26
+            // (mockup enviado pelo responsavel): foto para JPEG, xadrez de
+            // transparencia para PNG, arquivo generico para WEBP.
             formatChipAccent(ImageFormat.JPEG, accents).let { accent ->
                 FormatChip(
                     label = ImageFormat.JPEG.name,
@@ -354,6 +346,7 @@ private fun FormatCard(
                     accent = accent,
                     onClick = { onSelect(ImageFormat.JPEG) },
                     modifier = Modifier.weight(1f),
+                    leadingIcon = { tint -> Icon(FormatIconPhoto, contentDescription = null, tint = tint, modifier = Modifier.size(16.dp)) },
                 )
             }
             formatChipAccent(ImageFormat.PNG, accents).let { accent ->
@@ -363,6 +356,7 @@ private fun FormatCard(
                     accent = accent,
                     onClick = { onSelect(ImageFormat.PNG) },
                     modifier = Modifier.weight(1f),
+                    leadingIcon = { TransparencyChecker(size = 16.dp) },
                 )
             }
             formatChipAccent(ImageFormat.WEBP, accents).let { accent ->
@@ -372,6 +366,7 @@ private fun FormatCard(
                     accent = accent,
                     onClick = { onSelect(ImageFormat.WEBP) },
                     modifier = Modifier.weight(1f),
+                    leadingIcon = { tint -> Icon(FormatIconFile, contentDescription = null, tint = tint, modifier = Modifier.size(16.dp)) },
                 )
             }
         }
@@ -401,6 +396,7 @@ private fun FormatChip(
     accent: ToolAccent,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    leadingIcon: (@Composable (androidx.compose.ui.graphics.Color) -> Unit)? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
@@ -435,12 +431,41 @@ private fun FormatChip(
             .padding(horizontal = 8.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
-            text = label,
-            color = textColor,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 0.1.sp,
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            leadingIcon?.invoke(textColor)
+            Text(
+                text = label,
+                color = textColor,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.1.sp,
+            )
+        }
+    }
+}
+
+/**
+ * Xadrez de transparencia (referencia visual aprovada em 2026-08-26,
+ * mockup enviado pelo responsavel): duas cores fixas, independente da
+ * selecao do chip — e o simbolo convencional de "sem fundo", nao um
+ * icone tingivel como os outros dois.
+ */
+@Composable
+private fun TransparencyChecker(size: androidx.compose.ui.unit.Dp) {
+    val light = MaterialTheme.colorScheme.surfaceContainerHigh
+    val dark = MaterialTheme.colorScheme.outlineVariant
+    androidx.compose.foundation.Canvas(
+        modifier = Modifier
+            .size(size)
+            .clip(RoundedCornerShape(3.dp)),
+    ) {
+        val half = this.size.width / 2f
+        drawRect(color = light, size = androidx.compose.ui.geometry.Size(this.size.width, this.size.height))
+        drawRect(color = dark, size = androidx.compose.ui.geometry.Size(half, half))
+        drawRect(
+            color = dark,
+            topLeft = androidx.compose.ui.geometry.Offset(half, half),
+            size = androidx.compose.ui.geometry.Size(half, half),
         )
     }
 }

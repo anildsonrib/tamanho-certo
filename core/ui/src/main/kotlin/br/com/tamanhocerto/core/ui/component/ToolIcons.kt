@@ -137,33 +137,40 @@ val ToolIconPdfToImages: ImageVector by lazy {
 
 /**
  * Icone de arquivo de imagem, usado no cartao de resumo da tela
- * "Converter formato" (referencia visual aprovada em 2026-08-25,
- * `configure_convert_remodelado.html`).
- * `rect x=3 y=4 w=18 h=16 rx=2` + `circle cx=9 cy=10 r=2` + `m4 17 5-5 4 4 2-2 5 5`
+ * "Converter formato" — pagina com dobra no canto superior direito
+ * (referencia visual aprovada em 2026-08-26, mockup enviado pelo
+ * responsavel), no lugar do retangulo simples anterior.
  */
 val ToolIconFileImage: ImageVector by lazy {
     builder("ToolIconFileImage").apply {
         strokePath {
-            moveTo(5f, 4f)
-            horizontalLineToRelative(14f)
-            arcToRelative(2f, 2f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = 2f, dy1 = 2f)
-            verticalLineToRelative(12f)
+            // Contorno da pagina, com a dobra em (15,4)-(15,9)-(20,9).
+            moveTo(7f, 3f)
+            horizontalLineToRelative(8f)
+            lineToRelative(5f, 5f)
+            verticalLineToRelative(11f)
             arcToRelative(2f, 2f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = -2f, dy1 = 2f)
-            horizontalLineToRelative(-14f)
+            horizontalLineToRelative(-11f)
             arcToRelative(2f, 2f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = -2f, dy1 = -2f)
-            verticalLineToRelative(-12f)
+            verticalLineToRelative(-14f)
             arcToRelative(2f, 2f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = 2f, dy1 = -2f)
             close()
 
-            moveTo(7f, 10f)
-            arcToRelative(2f, 2f, 0f, isMoreThanHalf = true, isPositiveArc = true, dx1 = 4f, dy1 = 0f)
-            arcToRelative(2f, 2f, 0f, isMoreThanHalf = true, isPositiveArc = true, dx1 = -4f, dy1 = 0f)
+            moveTo(15f, 3f)
+            verticalLineToRelative(5f)
+            horizontalLineToRelative(5f)
 
-            moveTo(4f, 17f)
-            lineToRelative(5f, -5f)
-            lineToRelative(4f, 4f)
+            // Glifo de imagem (sol + montanha), centralizado na metade
+            // inferior da pagina.
+            moveTo(9.5f, 13f)
+            arcToRelative(1.3f, 1.3f, 0f, isMoreThanHalf = true, isPositiveArc = true, dx1 = 2.6f, dy1 = 0f)
+            arcToRelative(1.3f, 1.3f, 0f, isMoreThanHalf = true, isPositiveArc = true, dx1 = -2.6f, dy1 = 0f)
+
+            moveTo(7f, 19f)
+            lineToRelative(3.5f, -3.5f)
+            lineToRelative(2.5f, 2.5f)
             lineToRelative(2f, -2f)
-            lineToRelative(5f, 5f)
+            lineToRelative(3f, 3f)
         }
     }.build()
 }
@@ -223,6 +230,99 @@ val ToolIconConvert: ImageVector by lazy {
             moveTo(21f, 3f)
             verticalLineToRelative(6f)
             horizontalLineToRelative(-6f)
+        }
+    }.build()
+}
+
+/**
+ * Seta de "voltar", usada no botao "Voltar" da tela "Converter formato"
+ * (referencia visual aprovada em 2026-08-26, mockup enviado pelo
+ * responsavel) — `M15 6l-6 6 6 6`.
+ */
+val NavIconBackChevron: ImageVector by lazy {
+    builder("NavIconBackChevron").apply {
+        strokePath {
+            moveTo(15f, 6f)
+            lineToRelative(-6f, 6f)
+            lineToRelative(6f, 6f)
+        }
+    }.build()
+}
+
+/**
+ * Pasta, usada no botao "Selecionar arquivos" da tela "Converter formato"
+ * (mesma referencia do icone acima).
+ * `M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z`
+ */
+val ActionIconFolder: ImageVector by lazy {
+    builder("ActionIconFolder").apply {
+        strokePath {
+            moveTo(3f, 7f)
+            arcToRelative(2f, 2f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = 2f, dy1 = -2f)
+            horizontalLineToRelative(4f)
+            lineToRelative(2f, 2f)
+            horizontalLineToRelative(8f)
+            arcToRelative(2f, 2f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = 2f, dy1 = 2f)
+            verticalLineToRelative(8f)
+            arcToRelative(2f, 2f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = -2f, dy1 = 2f)
+            horizontalLineToRelative(-14f)
+            arcToRelative(2f, 2f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = -2f, dy1 = -2f)
+            close()
+        }
+    }.build()
+}
+
+/**
+ * Icones dos chips de formato, na tela "Converter formato" (mesma
+ * referencia dos dois icones acima): foto simples para JPEG, arquivo
+ * generico para WEBP. PNG usa `TransparencyChecker` (Canvas, nao vetor —
+ * o padrao xadrez precisa de duas cores fixas, independente da selecao).
+ */
+val FormatIconPhoto: ImageVector by lazy {
+    builder("FormatIconPhoto").apply {
+        strokePath {
+            moveTo(4f, 5f)
+            horizontalLineToRelative(16f)
+            arcToRelative(1f, 1f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = 1f, dy1 = 1f)
+            verticalLineToRelative(12f)
+            arcToRelative(1f, 1f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = -1f, dy1 = 1f)
+            horizontalLineToRelative(-16f)
+            arcToRelative(1f, 1f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = -1f, dy1 = -1f)
+            verticalLineToRelative(-12f)
+            arcToRelative(1f, 1f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = 1f, dy1 = -1f)
+            close()
+
+            moveTo(8.3f, 10f)
+            arcToRelative(1.3f, 1.3f, 0f, isMoreThanHalf = true, isPositiveArc = true, dx1 = 2.6f, dy1 = 0f)
+            arcToRelative(1.3f, 1.3f, 0f, isMoreThanHalf = true, isPositiveArc = true, dx1 = -2.6f, dy1 = 0f)
+
+            moveTo(5f, 18f)
+            lineToRelative(4.5f, -4.5f)
+            lineToRelative(3f, 3f)
+            lineToRelative(2.5f, -2.5f)
+            lineToRelative(4f, 4f)
+        }
+    }.build()
+}
+
+/** `rect x=4 y=3 w=16 h=18 rx=1.5` + `M9 3v4h6V3` (arquivo generico) */
+val FormatIconFile: ImageVector by lazy {
+    builder("FormatIconFile").apply {
+        strokePath {
+            moveTo(7f, 3f)
+            horizontalLineToRelative(7f)
+            lineToRelative(4f, 4f)
+            verticalLineToRelative(13f)
+            arcToRelative(1f, 1f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = -1f, dy1 = 1f)
+            horizontalLineToRelative(-10f)
+            arcToRelative(1f, 1f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = -1f, dy1 = -1f)
+            verticalLineToRelative(-16f)
+            arcToRelative(1f, 1f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = 1f, dy1 = -1f)
+            close()
+
+            moveTo(14f, 3f)
+            verticalLineToRelative(4f)
+            horizontalLineToRelative(4f)
         }
     }.build()
 }

@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import br.com.tamanhocerto.core.model.ImageFormat
+import androidx.compose.ui.graphics.vector.ImageVector
 import br.com.tamanhocerto.core.ui.component.NoticeKind
 import br.com.tamanhocerto.core.ui.component.PrimaryAction
 import br.com.tamanhocerto.core.ui.component.SecondaryAction
@@ -51,6 +52,11 @@ fun InputSummaryBlock(input: InputSummary) {
  * arquivo, mostra o verbo da propria ferramenta e executa a operacao. Um
  * segundo botao "Limpar" (com confirmacao) so aparece com arquivo
  * selecionado (pedido do responsavel em 2026-08-25).
+ *
+ * `selectFilesIcon` e aditivo (default `null` preserva as outras quatro
+ * ferramentas): so "Converter formato" passa um icone de pasta no botao
+ * "Selecionar arquivos", referencia visual aprovada em 2026-08-26 (mockup
+ * enviado pelo responsavel).
  */
 @Composable
 fun ToolActionBar(
@@ -61,12 +67,14 @@ fun ToolActionBar(
     onStart: () -> Unit,
     onClearAll: () -> Unit,
     modifier: Modifier = Modifier,
+    selectFilesIcon: ImageVector? = null,
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         PrimaryAction(
             text = if (hasFiles) actionLabel else stringResource(R.string.action_select_files),
             onClick = if (hasFiles) onStart else onPickFiles,
             enabled = !hasFiles || actionEnabled,
+            icon = if (hasFiles) null else selectFilesIcon,
             modifier = Modifier.fillMaxWidth(),
         )
 

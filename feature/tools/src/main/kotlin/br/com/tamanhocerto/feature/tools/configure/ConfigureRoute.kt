@@ -15,6 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.tamanhocerto.core.files.PickerContracts
 import br.com.tamanhocerto.core.model.ImageFormat
 import br.com.tamanhocerto.core.ui.component.AppScaffold
+import br.com.tamanhocerto.core.ui.component.NavIconBackChevron
 import br.com.tamanhocerto.core.ui.component.SecondaryAction
 import br.com.tamanhocerto.feature.tools.R
 import br.com.tamanhocerto.feature.tools.home.ToolId
@@ -66,7 +67,11 @@ fun ConfigureRoute(
         title = stringResource(state.tool.titleRes()),
         modifier = modifier,
         navigationIcon = {
-            SecondaryAction(text = stringResource(UiR.string.nav_back), onClick = onBack)
+            SecondaryAction(
+                text = stringResource(UiR.string.nav_back),
+                onClick = onBack,
+                icon = if (centerTitle) NavIconBackChevron else null,
+            )
         },
         centerTitle = centerTitle,
         titleStyle = if (centerTitle) {
