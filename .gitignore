@@ -34,7 +34,6 @@ Thumbs.db
 # Continua existindo em disco para o CLI carregar normalmente; so nao vai
 # mais para o git.
 /AGENTS.md
-/README.md
 /HANDOFF.md
 /TASKS.md
 /IMPLEMENTATION_PLAN.md
