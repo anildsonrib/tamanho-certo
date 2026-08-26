@@ -38,12 +38,12 @@ data class HomePalette(
 )
 
 val HomePaletteLight = HomePalette(
-    background = Color(0xFFF7F6FA),
+    background = Color(0xFFF7F8FB),
     surface = Color(0xFFFFFFFF),
-    text = Color(0xFF2F3137),
-    textSoft = Color(0xFF737780),
-    outline = Color(0xFFD9D8E0),
-    footer = Color(0xFF4F6C86),
+    text = Color(0xFF171A21),
+    textSoft = Color(0xFF707784),
+    outline = Color(0xFFE6E8EE),
+    footer = Color(0xFF5F7898),
 )
 
 val HomePaletteDark = HomePalette(
@@ -58,18 +58,18 @@ val HomePaletteDark = HomePalette(
 /** Cor de destaque de cada cartao da `home`: identidade visual por funcao. */
 data class ToolAccent(val color: Color, val soft: Color)
 
-private val Accent1 = Color(0xFFF0694F)
-private val Accent2 = Color(0xFFD99436)
-private val Accent3 = Color(0xFF79A95A)
-private val Accent4 = Color(0xFF547DB8)
-private val Accent5 = Color(0xFFA65D8D)
+private val Accent1 = Color(0xFFFF694F)
+private val Accent2 = Color(0xFFE79A39)
+private val Accent3 = Color(0xFF6FB35B)
+private val Accent4 = Color(0xFF4D85D6)
+private val Accent5 = Color(0xFFAF4CA8)
 
 private val ToolAccentsLight = listOf(
-    ToolAccent(Accent1, Color(0xFFFCE2DA)),
-    ToolAccent(Accent2, Color(0xFFFAE9CB)),
-    ToolAccent(Accent3, Color(0xFFE4F0DA)),
-    ToolAccent(Accent4, Color(0xFFDEE8F7)),
-    ToolAccent(Accent5, Color(0xFFF1DEEB)),
+    ToolAccent(Accent1, Color(0xFFFFE3DC)),
+    ToolAccent(Accent2, Color(0xFFFFF0D6)),
+    ToolAccent(Accent3, Color(0xFFE5F3DF)),
+    ToolAccent(Accent4, Color(0xFFDFEBFB)),
+    ToolAccent(Accent5, Color(0xFFF1DFF0)),
 )
 
 // O tom do "soft" muda no escuro; o tom principal do accent se mantem, como

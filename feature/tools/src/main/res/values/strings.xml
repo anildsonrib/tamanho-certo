@@ -2,6 +2,7 @@
 <!-- pt-BR (padrao). Catalogo em docs/STRINGS.md. -->
 <resources>
     <string name="home_title">O que você quer fazer?</string>
+    <string name="home_subtitle">Escolha uma opção para começar</string>
 
     <string name="tool_compress_title">Comprimir imagem</string>
     <string name="tool_compress_sub">Deixe a foto no tamanho que você precisa enviar</string>

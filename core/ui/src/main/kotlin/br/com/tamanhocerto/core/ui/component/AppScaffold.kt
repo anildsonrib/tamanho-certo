@@ -20,9 +20,14 @@ import androidx.compose.ui.text.TextStyle
  * edge-to-edge nao tem mais opt-out (ARCHITECTURE.md secao 9).
  *
  * `centerTitle`, `titleStyle` e `containerColor` sao aditivos (default
- * preserva o comportamento de toda tela existente) — usados apenas pela
- * `home`, para reproduzir a referencia visual aprovada em 2026-08-25 com o
- * `CenterAlignedTopAppBar` nativo do Material 3, em vez de duplicar a barra.
+ * preserva o comportamento de toda tela existente).
+ *
+ * `showTopBar = false` remove a barra de topo inteira — usado apenas pela
+ * `home`, cujo titulo/subtitulo passaram a fazer parte do proprio conteudo
+ * rolavel (referencia visual aprovada em 2026-08-26, `preview(1).html`,
+ * estilo CamScanner), em vez do `CenterAlignedTopAppBar`. O
+ * `safeDrawingPadding()` do Scaffold continua protegendo a barra de status
+ * mesmo sem topo.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,28 +38,31 @@ fun AppScaffold(
     centerTitle: Boolean = false,
     titleStyle: TextStyle? = null,
     containerColor: Color = MaterialTheme.colorScheme.background,
+    showTopBar: Boolean = true,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     Scaffold(
         modifier = modifier.safeDrawingPadding(),
         containerColor = containerColor,
         topBar = {
-            val titleText: @Composable () -> Unit = {
-                if (titleStyle != null) Text(title, style = titleStyle) else Text(title)
-            }
-            if (centerTitle) {
-                CenterAlignedTopAppBar(
-                    title = titleText,
-                    navigationIcon = navigationIcon,
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = containerColor,
-                    ),
-                )
-            } else {
-                TopAppBar(
-                    title = titleText,
-                    navigationIcon = navigationIcon,
-                )
+            if (showTopBar) {
+                val titleText: @Composable () -> Unit = {
+                    if (titleStyle != null) Text(title, style = titleStyle) else Text(title)
+                }
+                if (centerTitle) {
+                    CenterAlignedTopAppBar(
+                        title = titleText,
+                        navigationIcon = navigationIcon,
+                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                            containerColor = containerColor,
+                        ),
+                    )
+                } else {
+                    TopAppBar(
+                        title = titleText,
+                        navigationIcon = navigationIcon,
+                    )
+                }
             }
         },
         content = content,

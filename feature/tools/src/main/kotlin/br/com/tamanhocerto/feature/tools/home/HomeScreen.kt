@@ -1,27 +1,34 @@
 package br.com.tamanhocerto.feature.tools.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.BoxWithConstraints
 import br.com.tamanhocerto.core.ui.component.AppScaffold
+import br.com.tamanhocerto.core.ui.component.NavIconAbout
+import br.com.tamanhocerto.core.ui.component.NavIconPrivacy
 import br.com.tamanhocerto.core.ui.component.ToolCard
 import br.com.tamanhocerto.core.ui.component.ToolIconCompress
 import br.com.tamanhocerto.core.ui.component.ToolIconConvert
@@ -48,9 +55,12 @@ private val TOOLS = listOf(
     ToolId.CONVERT to Triple(R.string.tool_convert_title, R.string.tool_convert_sub, ToolIconConvert),
 )
 
-// Metricas da referencia visual aprovada (page-padding, gap, radius em px = dp).
-private val PagePadding = 14.dp
-private val Gap = 12.dp
+// Metricas da referencia visual aprovada em 2026-08-26 (`preview(1).html`,
+// estilo CamScanner; px = dp/sp, mesma convencao ja usada nesta tela).
+private val PagePadding = 22.dp
+private val Gap = 14.dp
+private val HeaderTopPadding = 48.dp
+private val GridTopMargin = 34.dp
 
 @Composable
 fun HomeScreen(
@@ -66,48 +76,69 @@ fun HomeScreen(
     AppScaffold(
         title = stringResource(R.string.home_title),
         modifier = modifier,
-        centerTitle = true,
-        titleStyle = TextStyle(
-            fontSize = 25.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = (-0.35).sp,
-        ),
+        showTopBar = false,
         containerColor = palette.background,
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
-            // O bloco de cartoes fica centralizado no espaco disponivel (nao
-            // preso ao topo), com rolagem apenas se a tela for pequena
-            // demais para caber tudo — mesma composicao do HTML de
-            // referencia, onde <main> tem flex:1 e align-content:center.
+            // Titulo, subtitulo e grade ficam ancorados no topo, com
+            // rolagem se a tela for pequena demais para caber tudo — mesma
+            // composicao do HTML de referencia (.content com padding-top
+            // fixo, sem centralizacao vertical).
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = PagePadding)
+                        .padding(top = HeaderTopPadding),
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_title),
+                        color = palette.text,
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        lineHeight = 35.sp,
+                        letterSpacing = (-0.8).sp,
+                    )
+                    Spacer(Modifier.height(10.dp))
+                    Text(
+                        text = stringResource(R.string.home_subtitle),
+                        color = palette.textSoft,
+                        fontSize = 17.sp,
+                        lineHeight = 25.sp,
+                    )
+                }
+
                 BoxWithConstraints(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = PagePadding, vertical = 8.dp),
+                        .padding(horizontal = PagePadding)
+                        .padding(top = GridTopMargin, bottom = 8.dp),
                 ) {
                     val cellWidth = (maxWidth - Gap) / 2
                     Column(verticalArrangement = Arrangement.spacedBy(Gap)) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(Gap)) {
-                            ToolCardFor(0, accents, onToolClick, Modifier.width(cellWidth))
-                            ToolCardFor(1, accents, onToolClick, Modifier.width(cellWidth))
-                        }
-                        Row(horizontalArrangement = Arrangement.spacedBy(Gap)) {
-                            ToolCardFor(2, accents, onToolClick, Modifier.width(cellWidth))
-                            ToolCardFor(3, accents, onToolClick, Modifier.width(cellWidth))
+                        Row(
+                            modifier = Modifier.height(IntrinsicSize.Max),
+                            horizontalArrangement = Arrangement.spacedBy(Gap),
+                        ) {
+                            ToolCardFor(0, accents, onToolClick, Modifier.width(cellWidth).fillMaxHeight())
+                            ToolCardFor(1, accents, onToolClick, Modifier.width(cellWidth).fillMaxHeight())
                         }
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.height(IntrinsicSize.Max),
+                            horizontalArrangement = Arrangement.spacedBy(Gap),
                         ) {
-                            ToolCardFor(4, accents, onToolClick, Modifier.width(cellWidth))
+                            ToolCardFor(2, accents, onToolClick, Modifier.width(cellWidth).fillMaxHeight())
+                            ToolCardFor(3, accents, onToolClick, Modifier.width(cellWidth).fillMaxHeight())
                         }
+                        // Quinto cartao ("Converter formato") ocupa a
+                        // largura toda, em formato horizontal — `.card.full`
+                        // no HTML de referencia.
+                        ToolCardFor(4, accents, onToolClick, Modifier.fillMaxWidth(), horizontal = true)
                     }
                 }
             }
@@ -115,28 +146,56 @@ fun HomeScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = PagePadding, vertical = 10.dp)
+                    .padding(horizontal = PagePadding, vertical = 14.dp)
                     .padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                TextButton(onClick = onPrivacyClick) {
-                    Text(
-                        text = stringResource(UiR.string.nav_privacy),
-                        color = palette.footer,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                    )
-                }
-                TextButton(onClick = onAboutClick) {
-                    Text(
-                        text = stringResource(UiR.string.nav_about),
-                        color = palette.footer,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                    )
-                }
+                FooterLink(
+                    icon = NavIconPrivacy,
+                    text = stringResource(UiR.string.nav_privacy),
+                    color = palette.footer,
+                    onClick = onPrivacyClick,
+                )
+                Spacer(
+                    Modifier
+                        .padding(horizontal = 6.dp)
+                        .width(1.dp)
+                        .height(22.dp)
+                        .background(palette.outline),
+                )
+                FooterLink(
+                    icon = NavIconAbout,
+                    text = stringResource(UiR.string.nav_about),
+                    color = palette.footer,
+                    onClick = onAboutClick,
+                )
             }
         }
+    }
+}
+
+@Composable
+private fun FooterLink(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    text: String,
+    color: androidx.compose.ui.graphics.Color,
+    onClick: () -> Unit,
+) {
+    TextButton(onClick = onClick) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = color,
+            modifier = Modifier.width(16.dp).height(16.dp),
+        )
+        Spacer(Modifier.width(6.dp))
+        Text(
+            text = text,
+            color = color,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+        )
     }
 }
 
@@ -146,6 +205,7 @@ private fun ToolCardFor(
     accents: List<ToolAccent>,
     onToolClick: (ToolId) -> Unit,
     modifier: Modifier,
+    horizontal: Boolean = false,
 ) {
     val (id, texts) = TOOLS[index]
     val (titleRes, subRes, icon) = texts
@@ -156,5 +216,6 @@ private fun ToolCardFor(
         accent = accents[index],
         onClick = { onToolClick(id) },
         modifier = modifier,
+        horizontal = horizontal,
     )
 }

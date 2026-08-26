@@ -168,6 +168,51 @@ val ToolIconFileImage: ImageVector by lazy {
     }.build()
 }
 
+/**
+ * Icones do rodape (Politica de privacidade / Sobre), referencia visual
+ * aprovada em 2026-08-26 (`preview(1).html`).
+ * `rect x=5 y=10 w=14 h=10 rx=2` + `M8 10V7a4 4 0 0 1 8 0v3`
+ */
+val NavIconPrivacy: ImageVector by lazy {
+    builder("NavIconPrivacy").apply {
+        strokePath {
+            moveTo(5f, 10f)
+            horizontalLineToRelative(14f)
+            arcToRelative(2f, 2f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = 2f, dy1 = 2f)
+            verticalLineToRelative(6f)
+            arcToRelative(2f, 2f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = -2f, dy1 = 2f)
+            horizontalLineToRelative(-14f)
+            arcToRelative(2f, 2f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = -2f, dy1 = -2f)
+            verticalLineToRelative(-6f)
+            arcToRelative(2f, 2f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = 2f, dy1 = -2f)
+            close()
+
+            moveTo(8f, 10f)
+            verticalLineTo(7f)
+            arcToRelative(4f, 4f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = 8f, dy1 = 0f)
+            verticalLineToRelative(3f)
+        }
+    }.build()
+}
+
+/** `circle cx=12 cy=12 r=9` + `M12 11v5` + `M12 8h.01` */
+val NavIconAbout: ImageVector by lazy {
+    builder("NavIconAbout").apply {
+        strokePath {
+            moveTo(21f, 12f)
+            arcToRelative(9f, 9f, 0f, isMoreThanHalf = true, isPositiveArc = true, dx1 = -18f, dy1 = 0f)
+            arcToRelative(9f, 9f, 0f, isMoreThanHalf = true, isPositiveArc = true, dx1 = 18f, dy1 = 0f)
+            close()
+
+            moveTo(12f, 11f)
+            verticalLineToRelative(5f)
+
+            moveTo(12f, 8f)
+            lineToRelative(0.01f, 0f)
+        }
+    }.build()
+}
+
 /** `M21 12a9 9 0 1 1-2.64-6.36` + `M21 3v6h-6` */
 val ToolIconConvert: ImageVector by lazy {
     builder("ToolIconConvert").apply {
