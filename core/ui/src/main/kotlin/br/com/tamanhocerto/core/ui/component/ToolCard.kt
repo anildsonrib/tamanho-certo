@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -45,16 +44,16 @@ import br.com.tamanhocerto.core.ui.theme.HomePaletteDark
 import br.com.tamanhocerto.core.ui.theme.HomePaletteLight
 import br.com.tamanhocerto.core.ui.theme.ToolAccent
 
-// Metricas da referencia visual aprovada em 2026-08-26 (`preview(1).html`,
-// px = dp/sp, mesma convencao ja usada nesta tela).
-private val CardMinHeight = 205.dp
-private val CardMinHeightFull = 154.dp
-private val CardRadius = 20.dp
-private val IconBadgeSize = 58.dp
-private val IconBadgeRadius = 12.dp
-private val IconSize = 31.dp
-private val ChipSize = 11.dp
-private val ChevronSize = 12.dp
+// Metricas da referencia visual aprovada em 2026-08-26 (`preview(1).html`),
+// ajustadas no mesmo dia (pedido do responsavel): tamanho do cartao nao e
+// mais fixo aqui — quem decide largura/altura (proporcao 3:4, cabendo as
+// cinco ferramentas na tela sem rolagem) e o `HomeScreen`, via `modifier`.
+private val CardRadius = 18.dp
+private val IconBadgeSize = 44.dp
+private val IconBadgeRadius = 10.dp
+private val IconSize = 24.dp
+private val ChipSize = 9.dp
+private val ChevronSize = 11.dp
 private const val PRESSED_SCALE = 0.985f
 private const val PRESS_ANIMATION_MS = 150
 
@@ -91,7 +90,6 @@ fun ToolCard(
     val shape = RoundedCornerShape(CardRadius)
 
     val cardModifier = modifier
-        .defaultMinSize(minHeight = if (horizontal) CardMinHeightFull else CardMinHeight)
         .graphicsLayer { scaleX = scale; scaleY = scale }
         .clip(shape)
         .background(palette.surface, shape)
@@ -107,14 +105,14 @@ fun ToolCard(
         Row(
             modifier = cardModifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, top = 24.dp, end = 20.dp, bottom = 20.dp),
+                .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             ToolIconBadge(icon, accent)
-            Spacer(Modifier.width(18.dp))
+            Spacer(Modifier.width(14.dp))
             Column(modifier = Modifier.weight(1f)) {
                 CardTitle(title, palette.text)
-                Spacer(Modifier.height(9.dp))
+                Spacer(Modifier.height(4.dp))
                 CardSubtitle(subtitle, palette.textSoft)
             }
             Spacer(Modifier.width(8.dp))
@@ -125,19 +123,19 @@ fun ToolCard(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 20.dp, top = 24.dp, end = 20.dp, bottom = 20.dp),
+                    .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 14.dp),
             ) {
                 ToolIconBadge(icon, accent)
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(12.dp))
                 CardTitle(title, palette.text)
-                Spacer(Modifier.height(9.dp))
+                Spacer(Modifier.height(4.dp))
                 CardSubtitle(subtitle, palette.textSoft)
             }
             Chevron(
                 tint = palette.textSoft,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 18.dp, bottom = 20.dp),
+                    .padding(end = 14.dp, bottom = 14.dp),
             )
         }
     }
@@ -183,10 +181,10 @@ private fun CardTitle(title: String, color: Color) {
     Text(
         text = title,
         color = color,
-        fontSize = 19.sp,
+        fontSize = 16.sp,
         fontWeight = FontWeight.ExtraBold,
-        lineHeight = 22.sp,
-        letterSpacing = (-0.25).sp,
+        lineHeight = 19.sp,
+        letterSpacing = (-0.2).sp,
     )
 }
 
@@ -195,9 +193,9 @@ private fun CardSubtitle(subtitle: String, color: Color) {
     Text(
         text = subtitle,
         color = color,
-        fontSize = 15.sp,
+        fontSize = 12.5.sp,
         fontWeight = FontWeight.Normal,
-        lineHeight = 22.sp,
+        lineHeight = 17.sp,
     )
 }
 

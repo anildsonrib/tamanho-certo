@@ -4,17 +4,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -56,11 +52,16 @@ private val TOOLS = listOf(
 )
 
 // Metricas da referencia visual aprovada em 2026-08-26 (`preview(1).html`,
-// estilo CamScanner; px = dp/sp, mesma convencao ja usada nesta tela).
-private val PagePadding = 22.dp
-private val Gap = 14.dp
-private val HeaderTopPadding = 48.dp
-private val GridTopMargin = 34.dp
+// estilo CamScanner). Ajustadas no mesmo dia (pedido do responsavel): os
+// quatro primeiros cartoes usam proporcao 3:4 (largura:altura), o quinto
+// tem a mesma altura dos outros mas ocupa a largura toda (como se fossem
+// dois cartoes juntos), e a largura/altura de cada um e calculada a partir
+// do espaco realmente disponivel (`GridArea` abaixo) para que as cinco
+// ferramentas cabam na tela sem rolagem e sem sobra, em qualquer aparelho.
+private val PagePadding = 20.dp
+private val Gap = 10.dp
+private val HeaderTopPadding = 8.dp
+private const val CardAspectWidthToHeight = 3f / 4f
 
 @Composable
 fun HomeScreen(
@@ -80,74 +81,85 @@ fun HomeScreen(
         containerColor = palette.background,
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
-            // Titulo, subtitulo e grade ficam ancorados no topo, com
-            // rolagem se a tela for pequena demais para caber tudo — mesma
-            // composicao do HTML de referencia (.content com padding-top
-            // fixo, sem centralizacao vertical).
+            // Cabecalho com altura propria (nao ocupa espaco extra alem do
+            // seu conteudo) — e medido primeiro pelo Column, sobrando para
+            // a grade exatamente o espaco entre ele e o rodape.
             Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = PagePadding)
+                    .padding(top = HeaderTopPadding),
+            ) {
+                Text(
+                    text = stringResource(R.string.home_title),
+                    color = palette.text,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    lineHeight = 28.sp,
+                    letterSpacing = (-0.6).sp,
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.home_subtitle),
+                    color = palette.textSoft,
+                    fontSize = 14.sp,
+                    lineHeight = 19.sp,
+                )
+            }
+
+            // Area da grade: ocupa exatamente o espaco que sobra entre o
+            // cabecalho e o rodape (`weight(1f)`), nunca mais nem menos —
+            // e o que garante caber as cinco ferramentas sem rolagem e sem
+            // sobra em qualquer altura de tela. Dentro dela, `cellWidth` e
+            // calculado tanto pela largura quanto pela altura disponiveis
+            // (o menor dos dois vence, como um "contain") para que os
+            // quatro primeiros cartoes fiquem exatamente 3:4 sem estourar
+            // nenhum dos dois eixos.
+            BoxWithConstraints(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
+                    .padding(horizontal = PagePadding, vertical = 10.dp),
+                contentAlignment = Alignment.Center,
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = PagePadding)
-                        .padding(top = HeaderTopPadding),
-                ) {
-                    Text(
-                        text = stringResource(R.string.home_title),
-                        color = palette.text,
-                        fontSize = 30.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        lineHeight = 35.sp,
-                        letterSpacing = (-0.8).sp,
-                    )
-                    Spacer(Modifier.height(10.dp))
-                    Text(
-                        text = stringResource(R.string.home_subtitle),
-                        color = palette.textSoft,
-                        fontSize = 17.sp,
-                        lineHeight = 25.sp,
-                    )
-                }
+                val cellWidthFromWidth = (maxWidth - Gap) / 2
+                val cardHeightFromHeight = (maxHeight - Gap * 2) / 3
+                val cellWidthFromHeight = cardHeightFromHeight * CardAspectWidthToHeight
+                val cellWidth = minOf(cellWidthFromWidth, cellWidthFromHeight)
+                val cardHeight = cellWidth / CardAspectWidthToHeight
+                val gridWidth = cellWidth * 2 + Gap
 
-                BoxWithConstraints(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = PagePadding)
-                        .padding(top = GridTopMargin, bottom = 8.dp),
+                Column(
+                    modifier = Modifier.width(gridWidth),
+                    verticalArrangement = Arrangement.spacedBy(Gap),
                 ) {
-                    val cellWidth = (maxWidth - Gap) / 2
-                    Column(verticalArrangement = Arrangement.spacedBy(Gap)) {
-                        Row(
-                            modifier = Modifier.height(IntrinsicSize.Max),
-                            horizontalArrangement = Arrangement.spacedBy(Gap),
-                        ) {
-                            ToolCardFor(0, accents, onToolClick, Modifier.width(cellWidth).fillMaxHeight())
-                            ToolCardFor(1, accents, onToolClick, Modifier.width(cellWidth).fillMaxHeight())
-                        }
-                        Row(
-                            modifier = Modifier.height(IntrinsicSize.Max),
-                            horizontalArrangement = Arrangement.spacedBy(Gap),
-                        ) {
-                            ToolCardFor(2, accents, onToolClick, Modifier.width(cellWidth).fillMaxHeight())
-                            ToolCardFor(3, accents, onToolClick, Modifier.width(cellWidth).fillMaxHeight())
-                        }
-                        // Quinto cartao ("Converter formato") ocupa a
-                        // largura toda, em formato horizontal — `.card.full`
-                        // no HTML de referencia.
-                        ToolCardFor(4, accents, onToolClick, Modifier.fillMaxWidth(), horizontal = true)
+                    Row(horizontalArrangement = Arrangement.spacedBy(Gap)) {
+                        ToolCardFor(0, accents, onToolClick, Modifier.width(cellWidth).height(cardHeight))
+                        ToolCardFor(1, accents, onToolClick, Modifier.width(cellWidth).height(cardHeight))
                     }
+                    Row(horizontalArrangement = Arrangement.spacedBy(Gap)) {
+                        ToolCardFor(2, accents, onToolClick, Modifier.width(cellWidth).height(cardHeight))
+                        ToolCardFor(3, accents, onToolClick, Modifier.width(cellWidth).height(cardHeight))
+                    }
+                    // Quinto cartao ("Converter formato"): mesma altura dos
+                    // outros quatro, mas ocupa a largura toda da grade —
+                    // como se fossem dois cartoes lado a lado — em formato
+                    // horizontal (`.card.full` no HTML de referencia).
+                    ToolCardFor(
+                        4,
+                        accents,
+                        onToolClick,
+                        Modifier.width(gridWidth).height(cardHeight),
+                        horizontal = true,
+                    )
                 }
             }
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = PagePadding, vertical = 14.dp)
-                    .padding(bottom = 8.dp),
+                    .padding(horizontal = PagePadding, vertical = 6.dp)
+                    .padding(bottom = 4.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
