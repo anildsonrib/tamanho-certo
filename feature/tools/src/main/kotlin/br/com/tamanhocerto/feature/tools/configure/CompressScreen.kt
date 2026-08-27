@@ -66,7 +66,7 @@ fun CompressScreen(
                 text = stringResource(R.string.compress_target_label),
                 style = MaterialTheme.typography.titleMedium,
             )
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            ChipFlowRow {
                 SizeShortcuts.values.forEach { bytes ->
                     SizeChip(
                         label = shortcutLabel(bytes),

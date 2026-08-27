@@ -98,7 +98,7 @@ fun ImagesToPdfScreen(
             text = stringResource(R.string.pdf_target),
             style = MaterialTheme.typography.titleMedium,
         )
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        ChipFlowRow {
             SizeShortcuts.values.forEach { bytes ->
                 SizeChip(
                     label = sizeShortcutLabel(bytes),
@@ -154,7 +154,7 @@ fun PdfToImagesScreen(
             text = stringResource(R.string.raster_pages),
             style = MaterialTheme.typography.titleMedium,
         )
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        ChipFlowRow {
             SizeChip(
                 label = stringResource(R.string.raster_pages_all),
                 selected = form.allPages,
@@ -244,7 +244,7 @@ private fun <T> ChipGroup(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(text = label, style = MaterialTheme.typography.titleMedium)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        ChipFlowRow {
             options.forEach { (value, labelRes) ->
                 SizeChip(
                     label = stringResource(labelRes),

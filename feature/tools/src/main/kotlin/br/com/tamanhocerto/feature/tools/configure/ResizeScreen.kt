@@ -124,7 +124,7 @@ fun ResizeScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                 )
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ChipFlowRow {
                     LONGEST_SIDE_SHORTCUTS.forEach { pixels ->
                         SizeChip(
                             label = pixels.toString(),

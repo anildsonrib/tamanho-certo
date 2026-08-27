@@ -454,7 +454,7 @@ private fun FlattenColorField(selected: Int, onSelect: (Int) -> Unit) {
             text = stringResource(R.string.convert_flatten_label),
             style = MaterialTheme.typography.titleMedium,
         )
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        ChipFlowRow {
             listOf(
                 OperationForm.WHITE to R.string.convert_flatten_white,
                 OperationForm.BLACK to R.string.convert_flatten_black,

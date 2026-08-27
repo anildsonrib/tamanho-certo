@@ -33,6 +33,33 @@ import br.com.tamanhocerto.core.ui.component.SizeChip
 import br.com.tamanhocerto.feature.tools.R
 import br.com.tamanhocerto.feature.tools.home.ToolId
 
+/**
+ * Espacamento entre chips, igual nos dois eixos — o `gap: 8px` do
+ * `.sizechips` no mockup (`docs/mockups/index.html`).
+ */
+private val ChipGap = 8.dp
+
+/**
+ * Linha de chips que quebra em varias linhas. Existe para o espacamento
+ * ficar num lugar so: ate 2026-08-27 cada tela montava o proprio
+ * `FlowRow` passando apenas `horizontalArrangement`, e sem
+ * `verticalArrangement` o padrao do `FlowRow` e zero — as linhas de chips
+ * ficavam coladas quando quebravam, o que aparecia em "Comprimir imagem"
+ * (seis atalhos de tamanho em duas linhas).
+ */
+@Composable
+fun ChipFlowRow(
+    modifier: Modifier = Modifier,
+    content: @Composable androidx.compose.foundation.layout.FlowRowScope.() -> Unit,
+) {
+    FlowRow(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(ChipGap),
+        verticalArrangement = Arrangement.spacedBy(ChipGap),
+        content = content,
+    )
+}
+
 /** Blocos comuns as cinco telas de configuracao. */
 @Composable
 fun InputSummaryBlock(input: InputSummary) {
@@ -134,7 +161,7 @@ fun FormatPicker(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(text = label, style = MaterialTheme.typography.titleMedium)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        ChipFlowRow {
             ImageFormat.entries.forEach { format ->
                 SizeChip(
                     label = format.name,
