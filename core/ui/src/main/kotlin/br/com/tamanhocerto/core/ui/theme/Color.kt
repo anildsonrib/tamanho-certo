@@ -55,7 +55,14 @@ val HomePaletteDark = HomePalette(
     footer = Color(0xFFAAC7E0),
 )
 
-/** Cor de destaque de cada cartao da `home`: identidade visual por funcao. */
+/**
+ * Cor de destaque de cada cartao da `home`: identidade visual por funcao.
+ *
+ * A partir de 2026-08-26 (pedido do responsavel) esta mesma cor vale
+ * tambem **dentro** da tela de cada ferramenta — o accent do formulario
+ * corresponde ao icone que a pessoa tocou na `home`, para que a
+ * identidade nao mude no meio do caminho.
+ */
 data class ToolAccent(val color: Color, val soft: Color)
 
 private val Accent1 = Color(0xFFFF694F)

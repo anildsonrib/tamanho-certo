@@ -28,6 +28,11 @@ private fun ImageVector.Builder.strokePath(block: androidx.compose.ui.graphics.v
     )
 }
 
+/** Preenchimento solido, para os quadradinhos do xadrez de `FormatIconPng`. */
+private fun ImageVector.Builder.fillPath(block: androidx.compose.ui.graphics.vector.PathBuilder.() -> Unit) {
+    path(fill = SolidColor(Color.Black), pathBuilder = block)
+}
+
 private fun builder(name: String) = ImageVector.Builder(
     name = name,
     defaultWidth = 24.dp,
@@ -256,7 +261,9 @@ val NavIconBackChevron: ImageVector by lazy {
  */
 val ActionIconFolder: ImageVector by lazy {
     builder("ActionIconFolder").apply {
-        strokePath {
+        // Preenchida, nao contornada (recorte de referencia enviado pelo
+        // responsavel em 2026-08-26): pasta branca solida sobre o botao.
+        fillPath {
             moveTo(3f, 7f)
             arcToRelative(2f, 2f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = 2f, dy1 = -2f)
             horizontalLineToRelative(4f)
@@ -301,6 +308,44 @@ val FormatIconPhoto: ImageVector by lazy {
             lineToRelative(3f, 3f)
             lineToRelative(2.5f, -2.5f)
             lineToRelative(4f, 4f)
+        }
+    }.build()
+}
+
+/**
+ * PNG: moldura arredondada com o xadrez de transparencia dentro
+ * (referencia visual aprovada em 2026-08-26, recorte enviado pelo
+ * responsavel) — mesmo estilo de traco dos outros dois icones de formato,
+ * e nao um quadriculado solto. O xadrez e preenchido; a moldura, tracada.
+ */
+val FormatIconPng: ImageVector by lazy {
+    builder("FormatIconPng").apply {
+        strokePath {
+            moveTo(6f, 3f)
+            horizontalLineToRelative(12f)
+            arcToRelative(3f, 3f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = 3f, dy1 = 3f)
+            verticalLineToRelative(12f)
+            arcToRelative(3f, 3f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = -3f, dy1 = 3f)
+            horizontalLineToRelative(-12f)
+            arcToRelative(3f, 3f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = -3f, dy1 = -3f)
+            verticalLineToRelative(-12f)
+            arcToRelative(3f, 3f, 0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = 3f, dy1 = -3f)
+            close()
+        }
+        // Xadrez 4x4 de quadrados de 3x3, entre 6 e 18: preenchido nas
+        // casas em que (coluna + linha) e par.
+        fillPath {
+            listOf(6f, 9f, 12f, 15f).forEachIndexed { col, x ->
+                listOf(6f, 9f, 12f, 15f).forEachIndexed { row, y ->
+                    if ((col + row) % 2 == 0) {
+                        moveTo(x, y)
+                        horizontalLineToRelative(3f)
+                        verticalLineToRelative(3f)
+                        horizontalLineToRelative(-3f)
+                        close()
+                    }
+                }
+            }
         }
     }.build()
 }

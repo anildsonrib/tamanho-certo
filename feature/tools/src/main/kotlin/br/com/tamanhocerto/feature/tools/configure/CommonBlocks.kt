@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import br.com.tamanhocerto.core.model.ImageFormat
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import br.com.tamanhocerto.core.ui.component.NoticeKind
 import br.com.tamanhocerto.core.ui.component.PrimaryAction
@@ -68,6 +69,7 @@ fun ToolActionBar(
     onClearAll: () -> Unit,
     modifier: Modifier = Modifier,
     selectFilesIcon: ImageVector? = null,
+    containerColor: Color? = null,
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         PrimaryAction(
@@ -75,6 +77,7 @@ fun ToolActionBar(
             onClick = if (hasFiles) onStart else onPickFiles,
             enabled = !hasFiles || actionEnabled,
             icon = if (hasFiles) null else selectFilesIcon,
+            containerColor = containerColor,
             modifier = Modifier.fillMaxWidth(),
         )
 

@@ -44,6 +44,7 @@ import br.com.tamanhocerto.core.model.ImageFormat
 import br.com.tamanhocerto.core.ui.component.ActionIconFolder
 import br.com.tamanhocerto.core.ui.component.FormatIconFile
 import br.com.tamanhocerto.core.ui.component.FormatIconPhoto
+import br.com.tamanhocerto.core.ui.component.FormatIconPng
 import br.com.tamanhocerto.core.ui.component.ToolIconFileImage
 import br.com.tamanhocerto.core.ui.theme.TamanhoCertoTheme
 import br.com.tamanhocerto.core.ui.theme.ToolAccent
@@ -83,7 +84,10 @@ fun ConvertScreen(
         // area de miniaturas vazia, o cartao mostra "Nenhum arquivo
         // selecionado" e o botao de baixo vira "Selecionar arquivos".
         Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            FileSummaryCard(input = state.input, accent = accents[0])
+            // Accent da propria ferramenta (roxo, no caso de Converter): a
+            // paleta interna corresponde ao icone da `home` (pedido do
+            // responsavel em 2026-08-26), nao mais o coral fixo de antes.
+            FileSummaryCard(input = state.input, accent = state.tool.accent())
 
             FormatCard(
                 selected = form.format,
@@ -109,6 +113,7 @@ fun ConvertScreen(
                 onStart = onStart,
                 onClearAll = onClearAll,
                 selectFilesIcon = ActionIconFolder,
+                containerColor = state.tool.accent().color,
             )
 
             // Miniaturas dos arquivos selecionados, na area vazia abaixo do
@@ -356,7 +361,7 @@ private fun FormatCard(
                     accent = accent,
                     onClick = { onSelect(ImageFormat.PNG) },
                     modifier = Modifier.weight(1f),
-                    leadingIcon = { TransparencyChecker(size = 16.dp) },
+                    leadingIcon = { tint -> Icon(FormatIconPng, contentDescription = null, tint = tint, modifier = Modifier.size(16.dp)) },
                 )
             }
             formatChipAccent(ImageFormat.WEBP, accents).let { accent ->
@@ -441,32 +446,6 @@ private fun FormatChip(
                 letterSpacing = 0.1.sp,
             )
         }
-    }
-}
-
-/**
- * Xadrez de transparencia (referencia visual aprovada em 2026-08-26,
- * mockup enviado pelo responsavel): duas cores fixas, independente da
- * selecao do chip — e o simbolo convencional de "sem fundo", nao um
- * icone tingivel como os outros dois.
- */
-@Composable
-private fun TransparencyChecker(size: androidx.compose.ui.unit.Dp) {
-    val light = MaterialTheme.colorScheme.surfaceContainerHigh
-    val dark = MaterialTheme.colorScheme.outlineVariant
-    androidx.compose.foundation.Canvas(
-        modifier = Modifier
-            .size(size)
-            .clip(RoundedCornerShape(3.dp)),
-    ) {
-        val half = this.size.width / 2f
-        drawRect(color = light, size = androidx.compose.ui.geometry.Size(this.size.width, this.size.height))
-        drawRect(color = dark, size = androidx.compose.ui.geometry.Size(half, half))
-        drawRect(
-            color = dark,
-            topLeft = androidx.compose.ui.geometry.Offset(half, half),
-            size = androidx.compose.ui.geometry.Size(half, half),
-        )
     }
 }
 

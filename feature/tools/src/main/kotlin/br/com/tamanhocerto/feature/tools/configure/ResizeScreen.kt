@@ -147,6 +147,9 @@ fun ResizeScreen(
             onPickFiles = onPickFiles,
             onStart = onStart,
             onClearAll = onClearAll,
+            // Paleta interna = cor do icone da ferramenta na `home`
+            // (pedido do responsavel em 2026-08-26).
+            containerColor = state.tool.accent().color,
         )
     }
 }

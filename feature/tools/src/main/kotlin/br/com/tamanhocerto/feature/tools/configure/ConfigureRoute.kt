@@ -3,6 +3,7 @@ package br.com.tamanhocerto.feature.tools.configure
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,6 +18,8 @@ import br.com.tamanhocerto.core.model.ImageFormat
 import br.com.tamanhocerto.core.ui.component.AppScaffold
 import br.com.tamanhocerto.core.ui.component.NavIconBackChevron
 import br.com.tamanhocerto.core.ui.component.SecondaryAction
+import br.com.tamanhocerto.core.ui.theme.ToolAccent
+import br.com.tamanhocerto.core.ui.theme.toolAccents
 import br.com.tamanhocerto.feature.tools.R
 import br.com.tamanhocerto.feature.tools.home.ToolId
 import br.com.tamanhocerto.feature.tools.result.ResultScreen
@@ -70,7 +73,11 @@ fun ConfigureRoute(
             SecondaryAction(
                 text = stringResource(UiR.string.nav_back),
                 onClick = onBack,
+                // A seta so existe no visual novo de Converter; a cor,
+                // essa vale para as cinco (paleta interna = icone da
+                // ferramenta na `home`).
                 icon = if (centerTitle) NavIconBackChevron else null,
+                contentColor = state.tool.accent().color,
             )
         },
         centerTitle = centerTitle,
@@ -177,6 +184,17 @@ internal fun ToolId.titleRes(): Int = when (this) {
     ToolId.PDF_TO_IMAGES -> R.string.tool_pdf2img_title
     ToolId.CONVERT -> R.string.tool_convert_title
 }
+
+/**
+ * Accent da ferramenta = o mesmo do cartao dela na `home` (pedido do
+ * responsavel em 2026-08-26: a paleta interna da tela corresponde ao icone
+ * que a pessoa tocou, para a identidade nao mudar no meio do caminho).
+ * `ToolId` esta na mesma ordem de `TOOLS` (`HomeScreen`) e de
+ * `toolAccents()`, por isso o `ordinal` indexa direto.
+ */
+@Composable
+internal fun ToolId.accent(): ToolAccent =
+    toolAccents(darkTheme = isSystemInDarkTheme())[ordinal]
 
 /** Rotulo do botao de acao quando ha arquivo selecionado — verbo por ferramenta. */
 internal fun ToolId.actionRes(): Int = when (this) {
