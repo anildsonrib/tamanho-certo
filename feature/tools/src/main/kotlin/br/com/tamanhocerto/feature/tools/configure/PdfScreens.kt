@@ -38,6 +38,7 @@ fun ImagesToPdfScreen(
     onRemoveImage: (index: Int) -> Unit,
     onStart: () -> Unit,
     onPickFiles: () -> Unit,
+    onAddFiles: () -> Unit,
     onClearAll: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -50,7 +51,7 @@ fun ImagesToPdfScreen(
     ) {
         // Entra direto no layout, sem tela intermediaria e sem o seletor do
         // sistema abrir sozinho (pedido do responsavel em 2026-08-25).
-        InputSummaryBlock(state.input)
+        InputSummaryBlock(state.input, state.tool.accent())
         Text(
             text = stringResource(R.string.pdf_reorder_hint),
             style = MaterialTheme.typography.bodySmall,
@@ -98,17 +99,16 @@ fun ImagesToPdfScreen(
             text = stringResource(R.string.pdf_target),
             style = MaterialTheme.typography.titleMedium,
         )
-        ChipFlowRow {
-            SizeShortcuts.values.forEach { bytes ->
-                SizeChip(
-                    label = sizeShortcutLabel(bytes),
-                    selected = form.targetBytes == bytes,
-                    onClick = {
-                        val next = if (form.targetBytes == bytes) null else bytes
-                        onFormChange(form.copy(targetBytes = next))
-                    },
-                )
-            }
+        ChipGrid(SizeShortcuts.values) { bytes, chipModifier ->
+            SizeChip(
+                label = sizeShortcutLabel(bytes),
+                selected = form.targetBytes == bytes,
+                onClick = {
+                    val next = if (form.targetBytes == bytes) null else bytes
+                    onFormChange(form.copy(targetBytes = next))
+                },
+                modifier = chipModifier,
+            )
         }
 
         (state.validation as? Validation.Blocked)?.let {
@@ -122,6 +122,7 @@ fun ImagesToPdfScreen(
             onPickFiles = onPickFiles,
             onStart = onStart,
             onClearAll = onClearAll,
+            onAddFiles = onAddFiles,
             // Paleta interna = cor do icone da ferramenta na `home`
             // (pedido do responsavel em 2026-08-26).
             containerColor = state.tool.accent().color,
@@ -148,22 +149,23 @@ fun PdfToImagesScreen(
     ) {
         // Entra direto no layout, sem tela intermediaria e sem o seletor do
         // sistema abrir sozinho (pedido do responsavel em 2026-08-25).
-        InputSummaryBlock(state.input)
+        InputSummaryBlock(state.input, state.tool.accent())
 
         Text(
             text = stringResource(R.string.raster_pages),
             style = MaterialTheme.typography.titleMedium,
         )
-        ChipFlowRow {
+        ChipGrid(
+            listOf(
+                R.string.raster_pages_all to true,
+                R.string.raster_pages_range to false,
+            ),
+        ) { (labelRes, all), chipModifier ->
             SizeChip(
-                label = stringResource(R.string.raster_pages_all),
-                selected = form.allPages,
-                onClick = { onFormChange(form.copy(allPages = true)) },
-            )
-            SizeChip(
-                label = stringResource(R.string.raster_pages_range),
-                selected = !form.allPages,
-                onClick = { onFormChange(form.copy(allPages = false)) },
+                label = stringResource(labelRes),
+                selected = form.allPages == all,
+                onClick = { onFormChange(form.copy(allPages = all)) },
+                modifier = chipModifier,
             )
         }
 
@@ -244,14 +246,13 @@ private fun <T> ChipGroup(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(text = label, style = MaterialTheme.typography.titleMedium)
-        ChipFlowRow {
-            options.forEach { (value, labelRes) ->
-                SizeChip(
-                    label = stringResource(labelRes),
-                    selected = value == selected,
-                    onClick = { onSelect(value) },
-                )
-            }
+        ChipGrid(options) { (value, labelRes), chipModifier ->
+            SizeChip(
+                label = stringResource(labelRes),
+                selected = value == selected,
+                onClick = { onSelect(value) },
+                modifier = chipModifier,
+            )
         }
     }
 }
@@ -278,6 +279,7 @@ private fun ImagesToPdfPreview() {
             onRemoveImage = {},
             onStart = {},
             onPickFiles = {},
+            onAddFiles = {},
             onClearAll = {},
         )
     }

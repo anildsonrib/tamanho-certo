@@ -6,6 +6,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -44,13 +47,25 @@ fun ConfigureRoute(
     // As cinco ferramentas entram direto no proprio layout e pedem o arquivo
     // por dentro dele (pedido do responsavel em 2026-08-25, revertendo o
     // gesto unico de UI-SPEC secao 3 para todas — comecou so em Converter).
+    // "Adicionar arquivos" e "Selecionar arquivos" usam o mesmo seletor; o
+    // que muda e se o resultado substitui a selecao ou soma a ela. O modo e
+    // decidido no toque e lido no retorno (pedido do responsavel em
+    // 2026-08-27: nao havia como acrescentar depois de escolher).
+    var appending by rememberSaveable { mutableStateOf(false) }
+
     val pickImagesLauncher = rememberLauncherForActivityResult(
         PickerContracts.pickImages(),
-    ) { picked -> if (picked.isNotEmpty()) viewModel.onInputSelected(picked) }
+    ) { picked ->
+        if (picked.isNotEmpty()) viewModel.onInputSelected(picked, append = appending)
+        appending = false
+    }
 
     val pickPdfLauncher = rememberLauncherForActivityResult(
         PickerContracts.openPdf(),
-    ) { picked -> if (picked != null) viewModel.onInputSelected(listOf(picked)) }
+    ) { picked ->
+        if (picked != null) viewModel.onInputSelected(listOf(picked), append = appending)
+        appending = false
+    }
 
     val saveLauncher = rememberLauncherForActivityResult(
         contract = PickerContracts.createDocument(
@@ -133,7 +148,12 @@ fun ConfigureRoute(
                         },
                         onStart = { viewModel.onStart() },
                         onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
+                        onAddFiles = {
+                            appending = true
+                            pickImagesLauncher.launch(imagePickRequest())
+                        },
                         onClearAll = viewModel::onClearAll,
+                        onRemoveFile = viewModel::onRemoveImage,
                         modifier = content,
                     )
 
@@ -143,7 +163,12 @@ fun ConfigureRoute(
                         onFormChange = viewModel::onFormChanged,
                         onStart = { viewModel.onStart() },
                         onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
+                        onAddFiles = {
+                            appending = true
+                            pickImagesLauncher.launch(imagePickRequest())
+                        },
                         onClearAll = viewModel::onClearAll,
+                        onRemoveFile = viewModel::onRemoveImage,
                         modifier = content,
                     )
 
@@ -155,6 +180,10 @@ fun ConfigureRoute(
                         onRemoveImage = viewModel::onRemoveImage,
                         onStart = { viewModel.onStart() },
                         onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
+                        onAddFiles = {
+                            appending = true
+                            pickImagesLauncher.launch(imagePickRequest())
+                        },
                         onClearAll = viewModel::onClearAll,
                         modifier = content,
                     )
@@ -176,6 +205,10 @@ fun ConfigureRoute(
                         onRemoveFile = viewModel::onRemoveImage,
                         onStart = { viewModel.onStart() },
                         onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
+                        onAddFiles = {
+                            appending = true
+                            pickImagesLauncher.launch(imagePickRequest())
+                        },
                         onClearAll = viewModel::onClearAll,
                         modifier = content,
                     )

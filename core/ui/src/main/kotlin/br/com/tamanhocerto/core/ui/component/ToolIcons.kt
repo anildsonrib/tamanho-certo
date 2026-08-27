@@ -432,3 +432,18 @@ val ActionIconConvertArrows: ImageVector by lazy {
         }
     }.build()
 }
+
+/**
+ * Seta para baixo do cabecalho recolhivel "Opcoes avancadas"
+ * (`.disclosure .caret` no mockup) — `M6 9l6 6 6-6`. Gira 180 graus quando
+ * a secao abre.
+ */
+val ActionIconCaret: ImageVector by lazy {
+    builder("ActionIconCaret").apply {
+        strokePath {
+            moveTo(6f, 9f)
+            lineToRelative(6f, 6f)
+            lineToRelative(6f, -6f)
+        }
+    }.build()
+}

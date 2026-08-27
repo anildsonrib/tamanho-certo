@@ -1,8 +1,19 @@
 package br.com.tamanhocerto.feature.tools.configure
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import br.com.tamanhocerto.core.ui.component.ActionIconCaret
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -44,7 +55,9 @@ fun CompressScreen(
     onSwitchToJpeg: () -> Unit,
     onStart: () -> Unit,
     onPickFiles: () -> Unit,
+    onAddFiles: () -> Unit,
     onClearAll: () -> Unit,
+    onRemoveFile: (index: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -57,63 +70,29 @@ fun CompressScreen(
         // Entra direto no layout, sem tela intermediaria e sem o seletor do
         // sistema abrir sozinho (pedido do responsavel em 2026-08-25). Com a
         // area de arquivos vazia, o resumo mostra "Nenhum arquivo
-        // selecionado" (InputSummaryBlock) e o botao de baixo vira
-        // "Selecionar arquivos" (ToolActionBar).
-        InputSummaryBlock(state.input)
+        // selecionado" e o botao de baixo vira "Selecionar arquivos".
+        InputSummaryBlock(state.input, state.tool.accent())
 
         if (!form.qualityMode) {
             Text(
                 text = stringResource(R.string.compress_target_label),
                 style = MaterialTheme.typography.titleMedium,
             )
-            ChipFlowRow {
-                SizeShortcuts.values.forEach { bytes ->
-                    SizeChip(
-                        label = shortcutLabel(bytes),
-                        selected = form.targetBytes == bytes && form.customValue.isEmpty(),
-                        onClick = { onFormChange(form.copy(targetBytes = bytes, customValue = "")) },
-                    )
-                }
+            ChipGrid(SizeShortcuts.values) { bytes, chipModifier ->
+                SizeChip(
+                    label = shortcutLabel(bytes),
+                    selected = form.targetBytes == bytes && form.customValue.isEmpty(),
+                    onClick = { onFormChange(form.copy(targetBytes = bytes, customValue = "")) },
+                    modifier = chipModifier,
+                )
             }
-            Text(
-                text = stringResource(R.string.compress_target_hint),
-                style = MaterialTheme.typography.bodySmall,
-            )
-
-            OutlinedTextField(
-                value = form.customValue,
-                onValueChange = { typed ->
-                    // Preencher o campo desmarca o chip, e vice-versa.
-                    onFormChange(
-                        form.copy(
-                            customValue = typed,
-                            targetBytes = typed.toLongOrNull()?.let {
-                                it * if (form.customUnitIsMb) MB else KB
-                            },
-                        ),
-                    )
-                },
-                label = { Text(stringResource(R.string.compress_custom_label)) },
-                suffix = {
-                    Text(
-                        if (form.customUnitIsMb) {
-                            stringResource(R.string.compress_unit_mb)
-                        } else {
-                            stringResource(R.string.compress_unit_kb)
-                        },
-                    )
-                },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
-            )
         }
 
-        FormatPicker(
-            label = stringResource(R.string.compress_format_label),
-            selected = form.format,
-            onSelect = { onFormChange(form.copy(format = it)) },
-        )
+        // Sem seletor de formato desde 2026-08-27 (pedido do responsavel): a
+        // saida mantem a extensao original do arquivo, e quem quiser trocar
+        // vai para "Converter formato". O `format` do formulario continua
+        // existindo, mas passa a ser preenchido pelo ViewModel a partir do
+        // arquivo escolhido — nao pela tela.
 
         state.notice?.let { notice ->
             NoticeCard(text = stringResource(notice.message), kind = notice.kind.toComponent())
@@ -122,7 +101,7 @@ fun CompressScreen(
             }
         }
 
-        AdvancedBlock(form = form, onFormChange = onFormChange)
+        AdvancedSection(form = form, onFormChange = onFormChange)
 
         (state.validation as? Validation.Blocked)?.let { blocked ->
             NoticeCard(text = blockedText(blocked), kind = NoticeKind.ERROR)
@@ -135,51 +114,130 @@ fun CompressScreen(
             onPickFiles = onPickFiles,
             onStart = onStart,
             onClearAll = onClearAll,
+            onAddFiles = onAddFiles,
             // Paleta interna = cor do icone da ferramenta na `home`
             // (pedido do responsavel em 2026-08-26).
             containerColor = state.tool.accent().color,
         )
+
+        // Miniaturas dos arquivos escolhidos, na area vazia abaixo do botao
+        // — o mesmo bloco de "Converter formato" (pedido do responsavel em
+        // 2026-08-27).
+        SelectedFilesGrid(items = state.input.items, onRemove = onRemoveFile)
     }
 }
 
 @Composable
-private fun AdvancedBlock(
+private fun AdvancedSection(
     form: OperationForm.Compress,
     onFormChange: (OperationForm.Compress) -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(
-            text = stringResource(R.string.action_advanced),
-            style = MaterialTheme.typography.titleSmall,
-        )
+    Column(modifier = Modifier.fillMaxWidth()) {
+        HorizontalDivider()
 
-        SwitchRow(
-            label = stringResource(R.string.compress_quality_mode),
-            checked = form.qualityMode,
-            onCheckedChange = { onFormChange(form.copy(qualityMode = it)) },
-        )
-
-        if (form.qualityMode) {
-            Text(stringResource(R.string.compress_quality_label))
-            Slider(
-                value = form.quality.toFloat(),
-                onValueChange = { onFormChange(form.copy(quality = it.toInt())) },
-                valueRange = QUALITY_RANGE_MIN..QUALITY_RANGE_MAX,
+        // Cabecalho que abre e fecha. Nasce fechada: e isso que faz a tela
+        // encolher de verdade (pedido do responsavel em 2026-08-27). O campo
+        // de valor livre desceu para ca no mesmo pedido — e o caminho de quem
+        // sabe o numero exato, nao o caminho comum.
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .clickable { onFormChange(form.copy(advancedExpanded = !form.advancedExpanded)) }
+                .heightIn(min = 48.dp)
+                .padding(horizontal = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(R.string.action_advanced),
+                style = MaterialTheme.typography.titleSmall,
+            )
+            val rotation by animateFloatAsState(
+                targetValue = if (form.advancedExpanded) 180f else 0f,
+                label = "advancedCaret",
+            )
+            Icon(
+                imageVector = ActionIconCaret,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(20.dp).graphicsLayer { rotationZ = rotation },
             )
         }
 
-        SwitchRow(
-            label = stringResource(R.string.compress_keep_metadata),
-            checked = form.keepMetadata,
-            onCheckedChange = { onFormChange(form.copy(keepMetadata = it)) },
-        )
-        if (!form.keepMetadata) {
-            Text(
-                text = stringResource(R.string.compress_keep_metadata_off),
-                style = MaterialTheme.typography.bodySmall,
-            )
+        AnimatedVisibility(visible = form.advancedExpanded) {
+            Column(
+                modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                if (!form.qualityMode) {
+                    CustomTargetField(form = form, onFormChange = onFormChange)
+                }
+
+                SwitchRow(
+                    label = stringResource(R.string.compress_quality_mode),
+                    checked = form.qualityMode,
+                    onCheckedChange = { onFormChange(form.copy(qualityMode = it)) },
+                )
+
+                if (form.qualityMode) {
+                    Text(stringResource(R.string.compress_quality_label))
+                    Slider(
+                        value = form.quality.toFloat(),
+                        onValueChange = { onFormChange(form.copy(quality = it.toInt())) },
+                        valueRange = QUALITY_RANGE_MIN..QUALITY_RANGE_MAX,
+                    )
+                }
+
+                SwitchRow(
+                    label = stringResource(R.string.compress_keep_metadata),
+                    checked = form.keepMetadata,
+                    onCheckedChange = { onFormChange(form.copy(keepMetadata = it)) },
+                )
+                if (!form.keepMetadata) {
+                    Text(
+                        text = stringResource(R.string.compress_keep_metadata_off),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CustomTargetField(
+    form: OperationForm.Compress,
+    onFormChange: (OperationForm.Compress) -> Unit,
+) {
+    OutlinedTextField(
+        value = form.customValue,
+        onValueChange = { typed ->
+            // Preencher o campo desmarca o chip, e vice-versa.
+            onFormChange(
+                form.copy(
+                    customValue = typed,
+                    targetBytes = typed.toLongOrNull()?.let {
+                        it * if (form.customUnitIsMb) MB else KB
+                    },
+                ),
+            )
+        },
+        label = { Text(stringResource(R.string.compress_custom_label)) },
+        suffix = {
+            Text(
+                if (form.customUnitIsMb) {
+                    stringResource(R.string.compress_unit_mb)
+                } else {
+                    stringResource(R.string.compress_unit_kb)
+                },
+            )
+        },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        modifier = Modifier.fillMaxWidth(),
+    )
 }
 
 @Composable
@@ -219,6 +277,8 @@ private fun CompressPreview() {
             onSwitchToJpeg = {},
             onPickFiles = {},
             onClearAll = {},
+            onAddFiles = {},
+            onRemoveFile = {},
             onStart = {},
         )
     }
@@ -241,6 +301,8 @@ private fun CompressPngNoticePreview() {
             onSwitchToJpeg = {},
             onPickFiles = {},
             onClearAll = {},
+            onAddFiles = {},
+            onRemoveFile = {},
             onStart = {},
         )
     }
@@ -259,6 +321,8 @@ private fun CompressBlockedPreview() {
             onSwitchToJpeg = {},
             onPickFiles = {},
             onClearAll = {},
+            onAddFiles = {},
+            onRemoveFile = {},
             onStart = {},
         )
     }

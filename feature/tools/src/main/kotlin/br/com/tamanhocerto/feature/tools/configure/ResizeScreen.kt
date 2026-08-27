@@ -42,7 +42,9 @@ fun ResizeScreen(
     onFormChange: (OperationForm.Resize) -> Unit,
     onStart: () -> Unit,
     onPickFiles: () -> Unit,
+    onAddFiles: () -> Unit,
     onClearAll: () -> Unit,
+    onRemoveFile: (index: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -54,7 +56,7 @@ fun ResizeScreen(
     ) {
         // Entra direto no layout, sem tela intermediaria e sem o seletor do
         // sistema abrir sozinho (pedido do responsavel em 2026-08-25).
-        InputSummaryBlock(state.input)
+        InputSummaryBlock(state.input, state.tool.accent())
 
         // So a aba selecionada leva a cor da ferramenta; as outras ficam em
         // `onSurfaceVariant`, como o `.tab` do mockup
@@ -124,14 +126,13 @@ fun ResizeScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                 )
-                ChipFlowRow {
-                    LONGEST_SIDE_SHORTCUTS.forEach { pixels ->
-                        SizeChip(
-                            label = pixels.toString(),
-                            selected = form.longestSide == pixels.toString(),
-                            onClick = { onFormChange(form.copy(longestSide = pixels.toString())) },
-                        )
-                    }
+                ChipGrid(LONGEST_SIDE_SHORTCUTS) { pixels, chipModifier ->
+                    SizeChip(
+                        label = pixels.toString(),
+                        selected = form.longestSide == pixels.toString(),
+                        onClick = { onFormChange(form.copy(longestSide = pixels.toString())) },
+                        modifier = chipModifier,
+                    )
                 }
             }
         }
@@ -147,11 +148,8 @@ fun ResizeScreen(
             )
         }
 
-        FormatPicker(
-            label = stringResource(R.string.compress_format_label),
-            selected = form.format,
-            onSelect = { onFormChange(form.copy(format = it)) },
-        )
+        // Sem seletor de formato desde 2026-08-27, pela mesma razao de
+        // "Comprimir imagem": a saida mantem a extensao original.
 
         ToolActionBar(
             hasFiles = state.input.fileCount >= 1,
@@ -160,10 +158,13 @@ fun ResizeScreen(
             onPickFiles = onPickFiles,
             onStart = onStart,
             onClearAll = onClearAll,
+            onAddFiles = onAddFiles,
             // Paleta interna = cor do icone da ferramenta na `home`
             // (pedido do responsavel em 2026-08-26).
             containerColor = state.tool.accent().color,
         )
+
+        SelectedFilesGrid(items = state.input.items, onRemove = onRemoveFile)
     }
 }
 
@@ -184,6 +185,8 @@ private fun ResizePreview() {
             onStart = {},
             onPickFiles = {},
             onClearAll = {},
+            onAddFiles = {},
+            onRemoveFile = {},
         )
     }
 }
@@ -203,6 +206,8 @@ private fun ResizeNoUpscalePreview() {
             onStart = {},
             onPickFiles = {},
             onClearAll = {},
+            onAddFiles = {},
+            onRemoveFile = {},
         )
     }
 }

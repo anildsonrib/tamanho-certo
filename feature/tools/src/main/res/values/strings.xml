@@ -26,6 +26,7 @@
     <string name="action_compare_hint">Toque e segure para ver o original</string>
     <string name="action_select_files">Selecionar arquivos</string>
     <string name="action_clear">Limpar</string>
+    <string name="action_add_files">Adicionar arquivos</string>
     <string name="clear_confirm_title">Limpar os arquivos selecionados?</string>
     <string name="clear_confirm_body">Os arquivos não são apagados do aparelho, só a seleção nesta tela.</string>
     <string name="clear_confirm_yes">Limpar</string>
@@ -46,8 +47,7 @@
 
     <!-- Comprimir -->
     <string name="compress_target_label">Qual o tamanho máximo?</string>
-    <string name="compress_target_hint">Limite comum em formulário de inscrição</string>
-    <string name="compress_custom_label">Outro valor</string>
+    <string name="compress_custom_label">Digite um valor diferente</string>
     <string name="compress_unit_kb">KB</string>
     <string name="compress_unit_mb">MB</string>
     <string name="compress_format_label">Formato do arquivo</string>

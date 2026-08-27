@@ -69,9 +69,16 @@ class ConfigureViewModel @Inject constructor(
     private var runningJob: Job? = null
     private var lastTargetBytes: Long? = null
 
-    fun onInputSelected(uris: List<Uri>) {
+    /**
+     * `append = true` soma a selecao atual em vez de substitui-la — e o
+     * "Adicionar arquivos" novo em 2026-08-27. Antes, escolher de novo
+     * descartava o que ja estava selecionado, e a unica outra saida era
+     * "Limpar".
+     */
+    fun onInputSelected(uris: List<Uri>, append: Boolean = false) {
         viewModelScope.launch {
-            sources = uris.map { ContentByteSource.from(context.contentResolver, it) }
+            val picked = uris.map { ContentByteSource.from(context.contentResolver, it) }
+            sources = if (append) sources + picked else picked
             val first = sources.firstOrNull()
             val items = sources.map { InputItem(displayName = it.displayName ?: "") }
             val totalBytes = sources.map { it.byteSize }
@@ -96,13 +103,51 @@ class ConfigureViewModel @Inject constructor(
                     ),
                 )
             }
+            // "Comprimir" e "Redimensionar" perderam o seletor de formato em
+            // 2026-08-27 (pedido do responsavel: a saida mantem a extensao
+            // original; quem quiser trocar vai para "Converter formato"). O
+            // campo `format` do formulario continua existindo — passa a ser
+            // preenchido aqui, a partir do arquivo, em vez de pela tela.
+            adoptSourceFormat(uris.firstOrNull())
+
             revalidate()
 
             // Miniaturas: lista reordenavel (imagem->PDF) e grade de
-            // selecionados (converter, pedido do responsavel em 2026-08-25).
-            // Decodificadas depois, para nao atrasar a entrada na tela
-            // (UI-SPEC secao 4.3).
-            if (tool == ToolId.IMAGES_TO_PDF || tool == ToolId.CONVERT) loadThumbnails()
+            // selecionados (converter desde 2026-08-25; comprimir e
+            // redimensionar desde 2026-08-27). Decodificadas depois, para
+            // nao atrasar a entrada na tela (UI-SPEC secao 4.3).
+            if (tool != ToolId.PDF_TO_IMAGES) loadThumbnails()
+        }
+    }
+
+    /**
+     * Deduz o formato de saida do arquivo de entrada. Le o MIME do
+     * `ContentResolver` e cai na extensao do nome quando o provedor nao
+     * informa. Sem os dois, mantem o que ja estava — ausencia de dado
+     * significa "nao sei", nunca um padrao permissivo.
+     */
+    private fun adoptSourceFormat(uri: Uri?) {
+        if (tool != ToolId.COMPRESS && tool != ToolId.RESIZE) return
+        val mime = uri?.let { context.contentResolver.getType(it) }
+        val name = sources.firstOrNull()?.displayName
+        val format = when {
+            mime == "image/png" -> ImageFormat.PNG
+            mime == "image/webp" -> ImageFormat.WEBP
+            mime == "image/jpeg" -> ImageFormat.JPEG
+            name?.endsWith(".png", ignoreCase = true) == true -> ImageFormat.PNG
+            name?.endsWith(".webp", ignoreCase = true) == true -> ImageFormat.WEBP
+            name?.endsWith(".jpg", ignoreCase = true) == true -> ImageFormat.JPEG
+            name?.endsWith(".jpeg", ignoreCase = true) == true -> ImageFormat.JPEG
+            // HEIC e afins nao tem codificador de saida: JPEG e o destino
+            // natural, e e o que o app ja fazia por padrao.
+            else -> ImageFormat.JPEG
+        }
+        _state.update { current ->
+            when (val f = current.form) {
+                is OperationForm.Compress -> current.copy(form = f.copy(format = format))
+                is OperationForm.Resize -> current.copy(form = f.copy(format = format))
+                else -> current
+            }
         }
     }
 

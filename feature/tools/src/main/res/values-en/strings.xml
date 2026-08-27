@@ -22,6 +22,7 @@
     <string name="action_compare_hint">Touch and hold to see the original</string>
     <string name="action_select_files">Select files</string>
     <string name="action_clear">Clear</string>
+    <string name="action_add_files">Add files</string>
     <string name="clear_confirm_title">Clear the selected files?</string>
     <string name="clear_confirm_body">The files aren\'t deleted from your device, only the selection on this screen.</string>
     <string name="clear_confirm_yes">Clear</string>
@@ -36,8 +37,7 @@
     <string name="pdf2img_action">Extract images</string>
     <string name="convert_action">Convert</string>
     <string name="compress_target_label">What\'s the size limit?</string>
-    <string name="compress_target_hint">Common limit on application forms</string>
-    <string name="compress_custom_label">Custom value</string>
+    <string name="compress_custom_label">Enter a different value</string>
     <string name="compress_unit_kb">KB</string>
     <string name="compress_unit_mb">MB</string>
     <string name="compress_format_label">File format</string>

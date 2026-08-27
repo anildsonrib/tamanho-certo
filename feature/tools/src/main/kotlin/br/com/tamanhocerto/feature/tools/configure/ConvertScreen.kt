@@ -66,6 +66,7 @@ fun ConvertScreen(
     onRemoveFile: (index: Int) -> Unit,
     onStart: () -> Unit,
     onPickFiles: () -> Unit,
+    onAddFiles: () -> Unit,
     onClearAll: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -111,6 +112,7 @@ fun ConvertScreen(
                 onPickFiles = onPickFiles,
                 onStart = onStart,
                 onClearAll = onClearAll,
+                onAddFiles = onAddFiles,
                 containerColor = state.tool.accent().color,
             )
 
@@ -123,194 +125,8 @@ fun ConvertScreen(
     }
 }
 
-// Miniatura em 9:16, independente da proporcao real do arquivo — pedido do
-// responsavel em 2026-08-25, para a grade ficar simetrica mesmo com fotos de
-// proporcoes diferentes.
-private val ThumbnailWidth = 64.dp
-private val ThumbnailHeight = 114.dp // 64 * 16/9
-private val ThumbnailBadgeSize = 24.dp
 
-@Composable
-private fun SelectedFilesGrid(items: List<InputItem>, onRemove: (index: Int) -> Unit) {
-    FlowRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp, alignment = Alignment.CenterHorizontally),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        items.forEachIndexed { index, item ->
-            SelectedFileThumbnail(
-                number = index + 1,
-                item = item,
-                onRemove = { onRemove(index) },
-            )
-        }
-    }
-}
 
-@Composable
-private fun SelectedFileThumbnail(number: Int, item: InputItem, onRemove: () -> Unit) {
-    val shape = RoundedCornerShape(12.dp)
-    Box(
-        modifier = Modifier
-            .width(ThumbnailWidth)
-            .height(ThumbnailHeight)
-            .semantics(mergeDescendants = true) {
-                contentDescription = "$number. ${item.displayName}"
-            },
-    ) {
-        Box(
-            modifier = Modifier
-                .width(ThumbnailWidth)
-                .height(ThumbnailHeight)
-                .clip(shape)
-                .background(MaterialTheme.colorScheme.surfaceContainerHigh, shape)
-                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, shape),
-        ) {
-            val bitmap = item.thumbnail
-            if (bitmap != null) {
-                androidx.compose.foundation.Image(
-                    bitmap = bitmap,
-                    contentDescription = null,
-                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-                    modifier = Modifier.width(ThumbnailWidth).height(ThumbnailHeight).clip(shape),
-                )
-            }
-        }
-
-        // Nome do arquivo, identificado desde a selecao — nao depende da
-        // miniatura ja ter carregado (pedido do responsavel em 2026-08-25).
-        // Faixa baixa (padding vertical minimo), so a altura do texto — a
-        // opacidade volta ao valor original; o ajuste pedido foi de altura,
-        // nao de opacidade (correcao em 2026-08-25).
-        Text(
-            text = item.displayName,
-            color = androidx.compose.ui.graphics.Color.White,
-            fontSize = 8.5.sp,
-            fontWeight = FontWeight.Medium,
-            lineHeight = 10.sp,
-            maxLines = 1,
-            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
-                .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.45f))
-                .padding(horizontal = 6.dp, vertical = 1.5.dp),
-        )
-
-        // Numero de selecao, dentro de um circulo pequeno que so cobre o
-        // proprio numero — nao escurece a miniatura em volta (pedido do
-        // responsavel em 2026-08-25, revertendo o "sem fundo" anterior por
-        // falta de visibilidade).
-        Box(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .size(22.dp)
-                .clip(RoundedCornerShape(50))
-                .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.55f)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = number.toString(),
-                color = androidx.compose.ui.graphics.Color.White,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-            )
-        }
-
-        // Botao de descartar, no canto superior direito, em vermelho suave
-        // (nao saturado) — pedido do responsavel em 2026-08-25.
-        val removeDescription = stringResource(R.string.action_remove)
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .offset(x = 6.dp, y = (-6).dp)
-                .size(ThumbnailBadgeSize)
-                .clip(RoundedCornerShape(50))
-                .background(MaterialTheme.colorScheme.errorContainer)
-                .border(1.dp, MaterialTheme.colorScheme.surfaceContainerHigh, RoundedCornerShape(50))
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = ripple(bounded = false),
-                    onClick = onRemove,
-                )
-                .semantics { contentDescription = removeDescription },
-            contentAlignment = Alignment.Center,
-        ) {
-            // Glifo de texto: evita adicionar a dependencia de
-            // material-icons-extended (mesmo padrao de ReorderableImageList.kt).
-            Text(
-                text = "✕",
-                color = MaterialTheme.colorScheme.onErrorContainer,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-            )
-        }
-    }
-}
-
-@Composable
-private fun FileSummaryCard(input: InputSummary, accent: ToolAccent) {
-    val shape = RoundedCornerShape(CardRadius)
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 94.dp)
-            .clip(shape)
-            .background(MaterialTheme.colorScheme.surfaceContainer, shape)
-            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, shape)
-            .padding(CardPadding),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-        Box(
-            modifier = Modifier
-                .size(50.dp)
-                .clip(RoundedCornerShape(13.dp))
-                .background(accent.soft),
-            contentAlignment = Alignment.Center,
-        ) {
-            // Icone de pagina com dobra no canto (referencia visual aprovada
-            // em 2026-08-26, mockup enviado pelo responsavel) — sem o
-            // emblema de destaque separado que havia antes no canto.
-            Icon(
-                imageVector = ToolIconFileImage,
-                contentDescription = null,
-                tint = accent.color,
-                modifier = Modifier.size(26.dp),
-            )
-        }
-        // Com mais de um arquivo selecionado, o cartao passa a resumir o
-        // lote inteiro — nome/tamanho do primeiro arquivo, sozinhos, nao
-        // representam a selecao (pedido do responsavel em 2026-08-25). Sem
-        // nenhum arquivo, mostra "Nenhum arquivo selecionado" — a tela
-        // inteira ja entra vazia, sem tela intermediaria.
-        Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            val title = input.multiCountText ?: input.displayName
-                ?: stringResource(R.string.input_empty_title)
-            title.let {
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    lineHeight = 19.sp,
-                )
-            }
-            val subtitle = input.multiCountText?.let { input.multiSizeText } ?: input.sizeText
-            subtitle?.let {
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 12.5.sp,
-                    lineHeight = 16.sp,
-                )
-            }
-        }
-    }
-}
 
 @Composable
 private fun FormatCard(
@@ -454,18 +270,19 @@ private fun FlattenColorField(selected: Int, onSelect: (Int) -> Unit) {
             text = stringResource(R.string.convert_flatten_label),
             style = MaterialTheme.typography.titleMedium,
         )
-        ChipFlowRow {
+        ChipGrid(
             listOf(
                 OperationForm.WHITE to R.string.convert_flatten_white,
                 OperationForm.BLACK to R.string.convert_flatten_black,
                 OperationForm.GRAY to R.string.convert_flatten_gray,
-            ).forEach { (color, labelRes) ->
-                br.com.tamanhocerto.core.ui.component.SizeChip(
-                    label = stringResource(labelRes),
-                    selected = selected == color,
-                    onClick = { onSelect(color) },
-                )
-            }
+            ),
+        ) { (color, labelRes), chipModifier ->
+            br.com.tamanhocerto.core.ui.component.SizeChip(
+                label = stringResource(labelRes),
+                selected = selected == color,
+                onClick = { onSelect(color) },
+                modifier = chipModifier,
+            )
         }
     }
 }
@@ -484,6 +301,7 @@ private fun ConvertPreview() {
             onStart = {},
             onPickFiles = {},
             onClearAll = {},
+            onAddFiles = {},
         )
     }
 }
