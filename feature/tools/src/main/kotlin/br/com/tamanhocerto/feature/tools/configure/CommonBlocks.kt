@@ -64,10 +64,19 @@ fun ChipFlowRow(
 @Composable
 fun InputSummaryBlock(input: InputSummary) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        // Com mais de um arquivo, a contagem vem primeiro: o nome do
+        // primeiro arquivo, sozinho, nao representa a selecao. Ate
+        // 2026-08-27 a ordem era `displayName ?: multiCountText`, e com tres
+        // arquivos o titulo dizia "40.png" enquanto o subtitulo logo abaixo
+        // dizia "Tamanho total: 574 kB" — as duas linhas discordando entre
+        // si, e a leitura de que so um arquivo havia entrado. A ordem certa
+        // ja existia em `ConvertScreen` desde 2026-08-25 (pedido do
+        // responsavel), mas nao tinha sido estendida as outras quatro telas.
+        //
         // Area de arquivos vazia: a tela inteira ja entra vazia (pedido do
         // responsavel em 2026-08-25), sem tela intermediaria — so o texto
         // muda aqui, mesmo lugar onde o nome do arquivo apareceria.
-        val title = input.displayName ?: input.multiCountText
+        val title = input.multiCountText ?: input.displayName
             ?: stringResource(R.string.input_empty_title).takeIf { input.fileCount < 1 }
         title?.let { Text(text = it, style = MaterialTheme.typography.titleSmall) }
         input.dimensionsText?.let {
