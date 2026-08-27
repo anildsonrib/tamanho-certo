@@ -73,10 +73,11 @@ fun ConfigureRoute(
             SecondaryAction(
                 text = stringResource(UiR.string.nav_back),
                 onClick = onBack,
-                // A seta so existe no visual novo de Converter; a cor,
-                // essa vale para as cinco (paleta interna = icone da
-                // ferramenta na `home`).
-                icon = if (centerTitle) NavIconBackChevron else null,
+                // A seta e a cor valem para as cinco: no mockup
+                // (`docs/mockups/index.html`) o `.back` e um bloco unico da
+                // barra de topo, com o chevron sempre presente. Ate
+                // 2026-08-27 so "Converter formato" tinha a seta.
+                icon = NavIconBackChevron,
                 contentColor = state.tool.accent().color,
             )
         },

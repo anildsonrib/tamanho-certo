@@ -17,11 +17,26 @@ import androidx.compose.ui.unit.dp
 private const val VIEWBOX = 24f
 private val StrokeWidth = 2f
 
-private fun ImageVector.Builder.strokePath(block: androidx.compose.ui.graphics.vector.PathBuilder.() -> Unit) {
+/**
+ * Tamanhos dos dois icones que aparecem dentro do botao de acao, iguais as
+ * variaveis `--icon-folder-size`, `--icon-convert-length`,
+ * `--icon-convert-size` e `--icon-convert-stroke` do mockup
+ * (`docs/mockups/index.html`). Sao maiores que os 18dp dos icones de texto
+ * porque no mockup a pasta e as setas dominam o botao.
+ */
+val ActionIconFolderSize = 30.dp
+val ConvertArrowsWidth = 35.dp
+val ConvertArrowsHeight = 25.dp
+private const val ConvertArrowsStroke = 3.5f
+
+private fun ImageVector.Builder.strokePath(
+    width: Float = StrokeWidth,
+    block: androidx.compose.ui.graphics.vector.PathBuilder.() -> Unit,
+) {
     path(
         fill = null,
         stroke = SolidColor(Color.Black),
-        strokeLineWidth = StrokeWidth,
+        strokeLineWidth = width,
         strokeLineCap = StrokeCap.Round,
         strokeLineJoin = StrokeJoin.Round,
         pathBuilder = block,
@@ -368,6 +383,52 @@ val FormatIconFile: ImageVector by lazy {
             moveTo(14f, 3f)
             verticalLineToRelative(4f)
             horizontalLineToRelative(4f)
+        }
+    }.build()
+}
+
+/**
+ * Duas setas opostas ("trocar"), usadas no botao de acao quando ja ha
+ * arquivo selecionado — o mesmo `#icon-convert` do mockup
+ * (`docs/mockups/index.html`), que o usa nas cinco ferramentas.
+ *
+ * O SVG do mockup e um viewBox 24x24 esticado com
+ * `preserveAspectRatio="none"` para 35x25 com `vector-effect:
+ * non-scaling-stroke`. O Compose nao tem equivalente disso: o `Icon`
+ * ajusta o vetor a caixa sem deformar. Por isso o traçado ja nasce aqui
+ * num viewport 35x25 — cada `x` do original multiplicado por 35/24 e cada
+ * `y` por 25/24 — e o traço fica com a grossura final de 3.5, como o
+ * `--icon-convert-stroke` do mockup.
+ */
+val ActionIconConvertArrows: ImageVector by lazy {
+    ImageVector.Builder(
+        name = "ActionIconConvertArrows",
+        defaultWidth = ConvertArrowsWidth,
+        defaultHeight = ConvertArrowsHeight,
+        viewportWidth = 35f,
+        viewportHeight = 25f,
+    ).apply {
+        // `M16 3l4 4-4 4` — ponta da seta que aponta para a direita.
+        strokePath(width = ConvertArrowsStroke) {
+            moveTo(23.333f, 3.125f)
+            lineTo(29.167f, 7.292f)
+            lineTo(23.333f, 11.458f)
+        }
+        // `M20 7H4` — haste da seta de cima.
+        strokePath(width = ConvertArrowsStroke) {
+            moveTo(29.167f, 7.292f)
+            lineTo(5.833f, 7.292f)
+        }
+        // `M8 21l-4-4 4-4` — ponta da seta que aponta para a esquerda.
+        strokePath(width = ConvertArrowsStroke) {
+            moveTo(11.667f, 21.875f)
+            lineTo(5.833f, 17.708f)
+            lineTo(11.667f, 13.542f)
+        }
+        // `M4 17h16` — haste da seta de baixo.
+        strokePath(width = ConvertArrowsStroke) {
+            moveTo(5.833f, 17.708f)
+            lineTo(23.333f, 17.708f)
         }
     }.build()
 }

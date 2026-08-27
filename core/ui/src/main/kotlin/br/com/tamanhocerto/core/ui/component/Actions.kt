@@ -14,10 +14,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 
 /** UI-SPEC secao 1: alvo de toque minimo, sem excecao. */
 private const val MIN_TOUCH_TARGET_DP = 48
+
+/**
+ * Altura do botao primario: `--action-height` do mockup
+ * (`docs/mockups/index.html`). Maior que os 48dp do alvo de toque minimo,
+ * que continua valendo como piso do botao secundario.
+ */
+private val ActionHeight = 54.dp
+
+/** Tamanho padrao do icone dentro do botao, quando ele existe. */
+private val DefaultActionIconSize = DpSize(18.dp, 18.dp)
 
 /**
  * Raio dos cantos dos botoes de acao. `24dp` e metade da altura minima
@@ -42,6 +53,7 @@ fun PrimaryAction(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     icon: ImageVector? = null,
+    iconSize: DpSize = DefaultActionIconSize,
     containerColor: Color? = null,
 ) {
     Button(
@@ -53,10 +65,10 @@ fun PrimaryAction(
         } else {
             ButtonDefaults.buttonColors()
         },
-        modifier = modifier.heightIn(min = MIN_TOUCH_TARGET_DP.dp),
+        modifier = modifier.heightIn(min = ActionHeight),
     ) {
         if (icon != null) {
-            Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(18.dp))
+            Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(iconSize))
             Spacer(Modifier.width(8.dp))
         }
         Text(text)

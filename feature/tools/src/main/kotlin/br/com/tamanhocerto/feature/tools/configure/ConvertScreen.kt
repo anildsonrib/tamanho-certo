@@ -41,7 +41,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.com.tamanhocerto.core.model.ImageFormat
-import br.com.tamanhocerto.core.ui.component.ActionIconFolder
 import br.com.tamanhocerto.core.ui.component.FormatIconFile
 import br.com.tamanhocerto.core.ui.component.FormatIconPhoto
 import br.com.tamanhocerto.core.ui.component.FormatIconPng
@@ -112,7 +111,6 @@ fun ConvertScreen(
                 onPickFiles = onPickFiles,
                 onStart = onStart,
                 onClearAll = onClearAll,
-                selectFilesIcon = ActionIconFolder,
                 containerColor = state.tool.accent().color,
             )
 

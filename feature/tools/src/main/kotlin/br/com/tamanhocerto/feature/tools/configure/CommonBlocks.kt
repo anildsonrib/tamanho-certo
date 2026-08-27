@@ -20,7 +20,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import br.com.tamanhocerto.core.model.ImageFormat
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.DpSize
+import br.com.tamanhocerto.core.ui.component.ActionIconConvertArrows
+import br.com.tamanhocerto.core.ui.component.ActionIconFolder
+import br.com.tamanhocerto.core.ui.component.ActionIconFolderSize
+import br.com.tamanhocerto.core.ui.component.ConvertArrowsHeight
+import br.com.tamanhocerto.core.ui.component.ConvertArrowsWidth
 import br.com.tamanhocerto.core.ui.component.NoticeKind
 import br.com.tamanhocerto.core.ui.component.PrimaryAction
 import br.com.tamanhocerto.core.ui.component.SecondaryAction
@@ -54,10 +59,11 @@ fun InputSummaryBlock(input: InputSummary) {
  * segundo botao "Limpar" (com confirmacao) so aparece com arquivo
  * selecionado (pedido do responsavel em 2026-08-25).
  *
- * `selectFilesIcon` e aditivo (default `null` preserva as outras quatro
- * ferramentas): so "Converter formato" passa um icone de pasta no botao
- * "Selecionar arquivos", referencia visual aprovada em 2026-08-26 (mockup
- * enviado pelo responsavel).
+ * Os dois icones do botao valem para as cinco ferramentas, como no
+ * `actionBar()` do mockup (`docs/mockups/index.html`), que e um bloco so,
+ * compartilhado por todas as telas: pasta sem arquivo selecionado, setas
+ * opostas com arquivo. Antes de 2026-08-27 so "Converter formato" tinha
+ * a pasta, e as setas nao existiam no Kotlin.
  */
 @Composable
 fun ToolActionBar(
@@ -68,7 +74,6 @@ fun ToolActionBar(
     onStart: () -> Unit,
     onClearAll: () -> Unit,
     modifier: Modifier = Modifier,
-    selectFilesIcon: ImageVector? = null,
     containerColor: Color? = null,
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -76,7 +81,12 @@ fun ToolActionBar(
             text = if (hasFiles) actionLabel else stringResource(R.string.action_select_files),
             onClick = if (hasFiles) onStart else onPickFiles,
             enabled = !hasFiles || actionEnabled,
-            icon = if (hasFiles) null else selectFilesIcon,
+            icon = if (hasFiles) ActionIconConvertArrows else ActionIconFolder,
+            iconSize = if (hasFiles) {
+                DpSize(ConvertArrowsWidth, ConvertArrowsHeight)
+            } else {
+                DpSize(ActionIconFolderSize, ActionIconFolderSize)
+            },
             containerColor = containerColor,
             modifier = Modifier.fillMaxWidth(),
         )
