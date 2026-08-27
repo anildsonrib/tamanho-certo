@@ -126,8 +126,7 @@
     <string name="notice_downsampled_memory">A imagem era muito grande e foi reduzida para caber na memória do aparelho.</string>
     <string name="notice_no_upscale">O app não amplia imagens: o resultado ficou no tamanho original.</string>
     <string name="notice_metadata_removed">A localização e os dados da câmera foram removidos.</string>
-    <string name="notice_png_lossless">PNG não perde qualidade, então quase nunca chega a um tamanho definido. Experimente JPEG ou WebP.</string>
-    <string name="notice_png_switch">Trocar para JPEG</string>
+    <string name="notice_png_lossless">PNG não perde qualidade. Para caber no tamanho pedido, o app vai reduzir as dimensões da imagem — o arquivo continua PNG.</string>
 
     <!-- Dialogo de alvo nao atingido -->
     <string name="downscale_title">Reduzir também as dimensões?</string>

@@ -182,4 +182,75 @@ class TargetSolverTest {
             assertEquals("cancelado", expected.message)
         }
     }
+
+    // ---- Formato sem perdas (PNG), a partir de 2026-08-27 ----
+    //
+    // Ate essa data o `ImagePipeline` recusava PNG com alvo em bytes antes de
+    // chegar aqui, sugerindo trocar de formato. O responsavel decidiu manter a
+    // extensao e chegar ao alvo reduzindo as dimensoes.
+
+    /** Probe sem perdas: a qualidade nao muda nada, so a area. */
+    private class LosslessProbe(private val fullSize: Long) : EncodeProbe {
+        var calls: Int = 0
+            private set
+
+        override suspend fun sizeAt(quality: Int, scale: Float): Long {
+            calls++
+            return (fullSize * (scale * scale).toDouble()).toLong()
+        }
+    }
+
+    @Test
+    fun `sem perdas nao gasta codificacao procurando qualidade`() = runTest {
+        val probe = LosslessProbe(fullSize = 1_000_000)
+
+        val result = solveTargetSize(
+            targetBytes = 250_000,
+            sourceBytes = 1_000_000,
+            reencodeRequired = false,
+            probe = probe,
+            allowDownscale = true,
+            lossless = true,
+        )
+
+        assertTrue("esperava Hit, veio $result", result is TargetSolution.Hit)
+        val hit = result as TargetSolution.Hit
+        assertTrue("deveria ter reduzido a escala", hit.scale < 1f)
+        assertTrue("deveria caber no alvo", hit.size <= 250_000)
+        // A busca por qualidade sozinha gastaria ~7 codificacoes inuteis.
+        assertTrue("codificacoes demais: ${probe.calls}", probe.calls <= 6)
+    }
+
+    @Test
+    fun `sem perdas que ja cabe em escala cheia nao reduz nada`() = runTest {
+        val probe = LosslessProbe(fullSize = 200_000)
+
+        val result = solveTargetSize(
+            targetBytes = 500_000,
+            sourceBytes = Long.MAX_VALUE, // forca a medicao
+            reencodeRequired = true,
+            probe = probe,
+            allowDownscale = true,
+            lossless = true,
+        )
+
+        assertEquals(TargetSolution.Hit(ImagingDefaults.QUALITY_MAX, 1f, 200_000), result)
+        assertEquals(1, probe.calls)
+    }
+
+    @Test
+    fun `sem perdas sem autorizacao para reduzir devolve NeedsDownscale`() = runTest {
+        val probe = LosslessProbe(fullSize = 1_000_000)
+
+        val result = solveTargetSize(
+            targetBytes = 250_000,
+            sourceBytes = 1_000_000,
+            reencodeRequired = false,
+            probe = probe,
+            allowDownscale = false,
+            lossless = true,
+        )
+
+        assertEquals(TargetSolution.NeedsDownscale(1_000_000), result)
+    }
 }

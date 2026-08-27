@@ -143,9 +143,6 @@ fun ConfigureRoute(
                         state = state,
                         form = form,
                         onFormChange = viewModel::onFormChanged,
-                        onSwitchToJpeg = {
-                            viewModel.onFormChanged(form.copy(format = ImageFormat.JPEG))
-                        },
                         onStart = { viewModel.onStart() },
                         onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
                         onAddFiles = {

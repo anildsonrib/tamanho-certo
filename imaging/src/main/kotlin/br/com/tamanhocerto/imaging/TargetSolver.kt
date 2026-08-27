@@ -33,6 +33,11 @@ sealed interface TargetSolution {
  *
  * @param sourceBytes tamanho REAL do arquivo de origem, nunca uma recodificacao.
  * @param reencodeRequired true quando o formato de saida difere do de origem.
+ * @param lossless true para formato sem perdas (PNG). A busca por qualidade
+ *   nao existe ali — `Bitmap.compress` ignora o parametro —, entao os passos
+ *   1 e 2 sao pulados e a unica alavanca e a escala. Antes de 2026-08-27 o
+ *   `ImagePipeline` cortava PNG na entrada e devolvia "troque de formato";
+ *   o responsavel decidiu manter a extensao e redimensionar, avisando.
  */
 suspend fun solveTargetSize(
     targetBytes: Long,
@@ -40,6 +45,7 @@ suspend fun solveTargetSize(
     reencodeRequired: Boolean,
     probe: EncodeProbe,
     allowDownscale: Boolean,
+    lossless: Boolean = false,
 ): TargetSolution {
     // Passo 0 — o original ja cabe? Comparado contra o arquivo de origem, e nao
     // contra uma recodificacao: um JPEG de 300 KB pode crescer para 800 KB ao
@@ -49,6 +55,15 @@ suspend fun solveTargetSize(
     }
 
     val counted = CountingProbe(probe)
+
+    // Formato sem perdas: a qualidade nao muda nada. Mede uma vez em escala
+    // cheia e, se nao couber, vai direto para a escala.
+    if (lossless) {
+        val full = counted.sizeAt(QUALITY_MAX, 1f)
+        if (full <= targetBytes) return TargetSolution.Hit(QUALITY_MAX, 1f, full)
+        if (!allowDownscale) return TargetSolution.NeedsDownscale(full)
+        return solveByScale(targetBytes, full, counted)
+    }
 
     // Passo 1 — busca binaria na qualidade, escala fixa em 1f.
     var lo = QUALITY_MIN
@@ -78,6 +93,19 @@ suspend fun solveTargetSize(
     // codificacoes e fechado: 1 (passo 2) + 1 (medida em escala cheia) +
     // MAX_SCALE_ITERATIONS, o que fecha o teto de MAX_PROBE_CALLS.
     val sizeAtFullScale = counted.sizeAt(QUALITY_AFTER_DOWNSCALE, 1f)
+    return solveByScale(targetBytes, sizeAtFullScale, counted)
+}
+
+/**
+ * Busca binaria so na escala, com a qualidade fixa. Usada pelo passo 3 da
+ * busca normal e, desde 2026-08-27, como unico caminho dos formatos sem
+ * perdas.
+ */
+private suspend fun solveByScale(
+    targetBytes: Long,
+    sizeAtFullScale: Long,
+    counted: CountingProbe,
+): TargetSolution {
     val guess = if (sizeAtFullScale <= 0L) {
         1f
     } else {

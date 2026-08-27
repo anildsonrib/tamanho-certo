@@ -436,7 +436,9 @@ class ConfigureViewModel @Inject constructor(
             NoticeState(
                 message = R.string.notice_png_lossless,
                 kind = NoticeKindUi.WARNING,
-                actionLabel = R.string.notice_png_switch,
+                // Sem botao de acao desde 2026-08-27: o app nao propoe mais
+                // trocar de formato. Mantem a extensao e reduz as dimensoes,
+                // avisando antes — decisao do responsavel.
             )
         } else {
             null

@@ -1,5 +1,6 @@
 package br.com.tamanhocerto.core.ui.component
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilterChip
@@ -11,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 /**
@@ -45,9 +47,15 @@ fun SizeChip(
         onClick = onClick,
         shape = RoundedCornerShape(ChipCornerRadius),
         label = {
+            // O `FilterChip` encosta o rotulo a esquerda quando o chip e mais
+            // largo que o texto — que passou a ser a regra com a grade de
+            // colunas iguais. Centralizado explicitamente, como o
+            // `text-align: center` do `.sizechip` no mockup.
             Text(
                 text = label,
                 fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
             )
         },
         border = FilterChipDefaults.filterChipBorder(

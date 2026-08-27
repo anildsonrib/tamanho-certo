@@ -43,22 +43,12 @@ object ImagePipeline {
         out: OutputStream,
         outputFile: File? = null,
     ): ImageOutcome {
-        // PNG e sem perdas: a busca nao tem o que buscar. Gastar sete
-        // codificacoes para descobrir isso e desperdicio, e a mensagem ao
-        // usuario e melhor (IMAGING-SPEC secao 8).
-        if (target is SizeTarget.Bytes && format == ImageFormat.PNG) {
-            val info = ImageReader.readInfo(source)
-            return ImageOutcome(
-                bytesWritten = 0L,
-                finalWidth = info.width,
-                finalHeight = info.height,
-                qualityUsed = null,
-                targetHit = false,
-                suggestion = Suggestion.TRY_LOSSY_FORMAT,
-                wasDownsampledForMemory = false,
-                didNotUpscale = false,
-            )
-        }
+        // PNG com alvo de tamanho NAO e mais recusado na entrada. Ate
+        // 2026-08-27 o app devolvia aqui mesmo a sugestao "troque para JPEG";
+        // o responsavel decidiu manter a extensao original e chegar ao alvo
+        // reduzindo as dimensoes, avisando antes. A busca por qualidade
+        // continua sem sentido em PNG — quem cuida disso e o `lossless` do
+        // `solveTargetSize`, que pula direto para a escala.
 
         return ImageReader.decode(source).use { image ->
             when (target) {
@@ -165,6 +155,7 @@ object ImagePipeline {
                 ImagingDefaults.DEFAULT_FLATTEN_COLOR,
             ),
             allowDownscale = allowDownscale,
+            lossless = !format.isLossy,
         )
 
         return when (solution) {

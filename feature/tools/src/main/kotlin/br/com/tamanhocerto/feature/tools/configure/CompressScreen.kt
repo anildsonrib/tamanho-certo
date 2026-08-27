@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import br.com.tamanhocerto.core.model.ImageFormat
 import br.com.tamanhocerto.core.ui.component.NoticeCard
 import br.com.tamanhocerto.core.ui.component.NoticeKind
-import br.com.tamanhocerto.core.ui.component.PrimaryAction
 import br.com.tamanhocerto.core.ui.component.SizeChip
 import br.com.tamanhocerto.core.ui.theme.TamanhoCertoTheme
 import br.com.tamanhocerto.feature.tools.R
@@ -52,7 +51,6 @@ fun CompressScreen(
     state: ConfigureUiState,
     form: OperationForm.Compress,
     onFormChange: (OperationForm.Compress) -> Unit,
-    onSwitchToJpeg: () -> Unit,
     onStart: () -> Unit,
     onPickFiles: () -> Unit,
     onAddFiles: () -> Unit,
@@ -94,11 +92,10 @@ fun CompressScreen(
         // existindo, mas passa a ser preenchido pelo ViewModel a partir do
         // arquivo escolhido — nao pela tela.
 
+        // Aviso do PNG: informa que o alvo sera atingido reduzindo as
+        // dimensoes, sem oferecer troca de formato (2026-08-27).
         state.notice?.let { notice ->
             NoticeCard(text = stringResource(notice.message), kind = notice.kind.toComponent())
-            notice.actionLabel?.let { label ->
-                PrimaryAction(text = stringResource(label), onClick = onSwitchToJpeg)
-            }
         }
 
         AdvancedSection(form = form, onFormChange = onFormChange)
@@ -274,7 +271,6 @@ private fun CompressPreview() {
             state = previewState(),
             form = OperationForm.Compress(targetBytes = 500 * KB),
             onFormChange = {},
-            onSwitchToJpeg = {},
             onPickFiles = {},
             onClearAll = {},
             onAddFiles = {},
@@ -293,12 +289,10 @@ private fun CompressPngNoticePreview() {
                 notice = NoticeState(
                     message = R.string.notice_png_lossless,
                     kind = NoticeKindUi.WARNING,
-                    actionLabel = R.string.notice_png_switch,
                 ),
             ),
             form = OperationForm.Compress(targetBytes = 100 * KB, format = ImageFormat.PNG),
             onFormChange = {},
-            onSwitchToJpeg = {},
             onPickFiles = {},
             onClearAll = {},
             onAddFiles = {},
@@ -318,7 +312,6 @@ private fun CompressBlockedPreview() {
             ),
             form = OperationForm.Compress(),
             onFormChange = {},
-            onSwitchToJpeg = {},
             onPickFiles = {},
             onClearAll = {},
             onAddFiles = {},
