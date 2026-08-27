@@ -386,7 +386,14 @@ class ConfigureViewModel @Inject constructor(
                 form.targetBytes == null || form.targetBytes <= 0 ->
                     Validation.Blocked(R.string.invalid_target_zero)
 
-                originalSize != null && form.targetBytes >= originalSize ->
+                // So bloqueia com UM arquivo. `originalSize` e o tamanho do
+                // PRIMEIRO da lista: num lote, barrar por ele impediria de
+                // comprimir os outros, que podem ser bem maiores. Achado do
+                // responsavel em 2026-08-27 — com tres arquivos, o app
+                // bloqueava os tres por causa do primeiro. Quem ja cabe no
+                // limite sai intacto: o motor resolve com `AlreadySmaller`.
+                input.fileCount <= 1 && originalSize != null &&
+                    form.targetBytes >= originalSize ->
                     Validation.Blocked(R.string.invalid_target_too_big, formatSize(originalSize))
 
                 else -> Validation.Ok

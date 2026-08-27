@@ -115,7 +115,7 @@
     <string name="error_cancelled">Cancelled.</string>
     <string name="error_unknown">Something went wrong with this file. Try another file or restart the app.</string>
     <string name="invalid_target_zero">Enter a size greater than zero.</string>
-    <string name="invalid_target_too_big">The limit must be smaller than the current size (%1$s).</string>
+    <string name="invalid_target_too_big">This photo is already %1$s. Pick a smaller limit, or enter a value under \"Advanced options\".</string>
     <string name="invalid_range">The range must be between 1 and %1$d.</string>
     <string name="invalid_no_images">Choose at least one image.</string>
     <string name="invalid_too_many">Choose up to %1$d files at a time.</string>

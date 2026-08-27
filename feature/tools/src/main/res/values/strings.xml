@@ -145,7 +145,7 @@
 
     <!-- Bloqueios de formulario -->
     <string name="invalid_target_zero">Informe um tamanho maior que zero.</string>
-    <string name="invalid_target_too_big">O limite precisa ser menor que o tamanho atual (%1$s).</string>
+    <string name="invalid_target_too_big">Esta foto já tem %1$s. Escolha um limite menor, ou digite um valor em \"Opções avançadas\".</string>
     <string name="invalid_range">O intervalo precisa estar entre 1 e %1$d.</string>
     <string name="invalid_no_images">Escolha pelo menos uma imagem.</string>
     <string name="invalid_too_many">Escolha no máximo %1$d arquivos por vez.</string>
