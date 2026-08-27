@@ -52,3 +52,43 @@ fun TamanhoCertoTheme(
         )
     }
 }
+
+/**
+ * Reveste um trecho da arvore com a cor de destaque de uma ferramenta.
+ *
+ * Regra de identidade visual fixada pelo responsavel em 2026-08-26: a
+ * paleta interna de cada ferramenta corresponde a cor do icone dela na
+ * `home`. Ate 2026-08-27 isso era feito ponto a ponto — cada componente
+ * recebia a cor por parametro — e por isso alcançava so o botao de acao,
+ * o "Voltar" e os chips de "Converter formato". Tudo o mais (chip de
+ * tamanho selecionado, aba, controle deslizante, chave, barra de
+ * progresso) continuava no `primary` do esquema, que com
+ * `dynamicColor = true` vem do papel de parede do aparelho — no emulador,
+ * o lilas que aparecia no lugar do coral.
+ *
+ * Trocar o `primary` do esquema uma vez so, no topo da tela, e o
+ * equivalente do `--accent` do mockup (`docs/mockups/index.html`), que e
+ * uma variavel CSS trocada por ferramenta e herdada por todos os
+ * seletores que a usam.
+ *
+ * `soft` entra como `secondaryContainer` porque e ele que o `FilterChip`
+ * usa no estado selecionado — o mesmo par `--accent-soft` / `--accent`
+ * do `.sizechip[data-selected]`.
+ */
+@Composable
+fun ToolAccentTheme(accent: ToolAccent, content: @Composable () -> Unit) {
+    val base = MaterialTheme.colorScheme
+    MaterialTheme(
+        colorScheme = base.copy(
+            primary = accent.color,
+            onPrimary = OnAccent,
+            primaryContainer = accent.soft,
+            onPrimaryContainer = accent.color,
+            secondaryContainer = accent.soft,
+            onSecondaryContainer = accent.color,
+        ),
+        typography = MaterialTheme.typography,
+        shapes = MaterialTheme.shapes,
+        content = content,
+    )
+}

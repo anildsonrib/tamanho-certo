@@ -65,6 +65,13 @@ val HomePaletteDark = HomePalette(
  */
 data class ToolAccent(val color: Color, val soft: Color)
 
+/**
+ * Cor do texto e do icone sobre o accent cheio (botao de acao) —
+ * `--on-accent` do mockup. Branco nos dois temas: os cinco accents sao
+ * saturados o bastante para nao mudar no escuro.
+ */
+val OnAccent = Color(0xFFFFFFFF)
+
 private val Accent1 = Color(0xFFFF694F)
 private val Accent2 = Color(0xFFE79A39)
 private val Accent3 = Color(0xFF6FB35B)

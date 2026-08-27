@@ -17,6 +17,7 @@ import br.com.tamanhocerto.core.files.PickerContracts
 import br.com.tamanhocerto.core.model.ImageFormat
 import br.com.tamanhocerto.core.ui.component.AppScaffold
 import br.com.tamanhocerto.core.ui.component.NavIconBackChevron
+import br.com.tamanhocerto.core.ui.theme.ToolAccentTheme
 import br.com.tamanhocerto.core.ui.component.SecondaryAction
 import br.com.tamanhocerto.core.ui.theme.ToolAccent
 import br.com.tamanhocerto.core.ui.theme.toolAccents
@@ -66,108 +67,119 @@ fun ConfigureRoute(
     // em 2026-08-25, `configure_convert_remodelado.html`) — as outras quatro
     // telas de configuracao mantem o `TopAppBar` padrao, sem alteracao.
     val centerTitle = state.tool == ToolId.CONVERT
-    AppScaffold(
-        title = stringResource(state.tool.titleRes()),
-        modifier = modifier,
-        navigationIcon = {
-            SecondaryAction(
-                text = stringResource(UiR.string.nav_back),
-                onClick = onBack,
-                // A seta e a cor valem para as cinco: no mockup
-                // (`docs/mockups/index.html`) o `.back` e um bloco unico da
-                // barra de topo, com o chevron sempre presente. Ate
-                // 2026-08-27 so "Converter formato" tinha a seta.
-                icon = NavIconBackChevron,
-                contentColor = state.tool.accent().color,
-            )
-        },
-        centerTitle = centerTitle,
-        titleStyle = if (centerTitle) {
-            androidx.compose.ui.text.TextStyle(
-                fontSize = 22.sp,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                letterSpacing = (-0.25).sp,
-            )
-        } else {
-            null
-        },
-    ) { padding ->
-        val content = Modifier.padding(padding)
 
-        when (val phase = state.phase) {
-            is Phase.Running -> ProcessingContent(
-                phase = phase,
-                onCancel = viewModel::onCancel,
-                modifier = content,
-            )
+    // O accent da ferramenta reveste a tela inteira, em vez de ser passado
+    // componente a componente — equivale a variavel CSS `--accent` do
+    // mockup (`docs/mockups/index.html`), trocada por ferramenta e herdada
+    // por tudo que a usa: chip de tamanho selecionado, aba, controle
+    // deslizante, chave, barra de progresso, botao de dialogo. Ate
+    // 2026-08-27 so o botao de acao, o "Voltar" e os chips de Converter
+    // recebiam a cor; o resto ficava no `primary` do esquema, que com
+    // `dynamicColor = true` vem do papel de parede do aparelho.
+    ToolAccentTheme(accent = state.tool.accent()) {
+        AppScaffold(
+            title = stringResource(state.tool.titleRes()),
+            modifier = modifier,
+            navigationIcon = {
+                SecondaryAction(
+                    text = stringResource(UiR.string.nav_back),
+                    onClick = onBack,
+                    // A seta e a cor valem para as cinco: no mockup
+                    // (`docs/mockups/index.html`) o `.back` e um bloco unico da
+                    // barra de topo, com o chevron sempre presente. Ate
+                    // 2026-08-27 so "Converter formato" tinha a seta.
+                    icon = NavIconBackChevron,
+                    contentColor = state.tool.accent().color,
+                )
+            },
+            centerTitle = centerTitle,
+            titleStyle = if (centerTitle) {
+                androidx.compose.ui.text.TextStyle(
+                    fontSize = 22.sp,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    letterSpacing = (-0.25).sp,
+                )
+            } else {
+                null
+            },
+        ) { padding ->
+            val content = Modifier.padding(padding)
 
-            Phase.Done -> ResultScreen(
-                state = result,
-                onSave = { saveLauncher.launch(result.items.firstOrNull()?.name.orEmpty()) },
-                onShare = { viewModel.share(context) },
-                onRedo = viewModel::onRedo,
-                onHome = onHome,
-                onDownscaleAccept = viewModel::onDownscaleAccepted,
-                onDownscaleDecline = viewModel::onDownscaleDeclined,
-                modifier = content,
-            )
-
-            Phase.Idle -> when (val form = state.form) {
-                is OperationForm.Compress -> CompressScreen(
-                    state = state,
-                    form = form,
-                    onFormChange = viewModel::onFormChanged,
-                    onSwitchToJpeg = {
-                        viewModel.onFormChanged(form.copy(format = ImageFormat.JPEG))
-                    },
-                    onStart = { viewModel.onStart() },
-                    onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
-                    onClearAll = viewModel::onClearAll,
+            when (val phase = state.phase) {
+                is Phase.Running -> ProcessingContent(
+                    phase = phase,
+                    onCancel = viewModel::onCancel,
                     modifier = content,
                 )
 
-                is OperationForm.Resize -> ResizeScreen(
-                    state = state,
-                    form = form,
-                    onFormChange = viewModel::onFormChanged,
-                    onStart = { viewModel.onStart() },
-                    onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
-                    onClearAll = viewModel::onClearAll,
+                Phase.Done -> ResultScreen(
+                    state = result,
+                    onSave = { saveLauncher.launch(result.items.firstOrNull()?.name.orEmpty()) },
+                    onShare = { viewModel.share(context) },
+                    onRedo = viewModel::onRedo,
+                    onHome = onHome,
+                    onDownscaleAccept = viewModel::onDownscaleAccepted,
+                    onDownscaleDecline = viewModel::onDownscaleDeclined,
                     modifier = content,
                 )
 
-                is OperationForm.ImagesToPdf -> ImagesToPdfScreen(
-                    state = state,
-                    form = form,
-                    onFormChange = viewModel::onFormChanged,
-                    onMoveImage = viewModel::onReorderImages,
-                    onRemoveImage = viewModel::onRemoveImage,
-                    onStart = { viewModel.onStart() },
-                    onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
-                    onClearAll = viewModel::onClearAll,
-                    modifier = content,
-                )
+                Phase.Idle -> when (val form = state.form) {
+                    is OperationForm.Compress -> CompressScreen(
+                        state = state,
+                        form = form,
+                        onFormChange = viewModel::onFormChanged,
+                        onSwitchToJpeg = {
+                            viewModel.onFormChanged(form.copy(format = ImageFormat.JPEG))
+                        },
+                        onStart = { viewModel.onStart() },
+                        onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
+                        onClearAll = viewModel::onClearAll,
+                        modifier = content,
+                    )
 
-                is OperationForm.PdfToImages -> PdfToImagesScreen(
-                    state = state,
-                    form = form,
-                    onFormChange = viewModel::onFormChanged,
-                    onStart = { viewModel.onStart() },
-                    onPickFiles = { pickPdfLauncher.launch(PickerContracts.PDF_MIME_FILTER) },
-                    onClearAll = viewModel::onClearAll,
-                    modifier = content,
-                )
+                    is OperationForm.Resize -> ResizeScreen(
+                        state = state,
+                        form = form,
+                        onFormChange = viewModel::onFormChanged,
+                        onStart = { viewModel.onStart() },
+                        onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
+                        onClearAll = viewModel::onClearAll,
+                        modifier = content,
+                    )
 
-                is OperationForm.Convert -> ConvertScreen(
-                    state = state,
-                    form = form,
-                    onFormChange = viewModel::onFormChanged,
-                    onRemoveFile = viewModel::onRemoveImage,
-                    onStart = { viewModel.onStart() },
-                    onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
-                    onClearAll = viewModel::onClearAll,
-                    modifier = content,
-                )
+                    is OperationForm.ImagesToPdf -> ImagesToPdfScreen(
+                        state = state,
+                        form = form,
+                        onFormChange = viewModel::onFormChanged,
+                        onMoveImage = viewModel::onReorderImages,
+                        onRemoveImage = viewModel::onRemoveImage,
+                        onStart = { viewModel.onStart() },
+                        onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
+                        onClearAll = viewModel::onClearAll,
+                        modifier = content,
+                    )
+
+                    is OperationForm.PdfToImages -> PdfToImagesScreen(
+                        state = state,
+                        form = form,
+                        onFormChange = viewModel::onFormChanged,
+                        onStart = { viewModel.onStart() },
+                        onPickFiles = { pickPdfLauncher.launch(PickerContracts.PDF_MIME_FILTER) },
+                        onClearAll = viewModel::onClearAll,
+                        modifier = content,
+                    )
+
+                    is OperationForm.Convert -> ConvertScreen(
+                        state = state,
+                        form = form,
+                        onFormChange = viewModel::onFormChanged,
+                        onRemoveFile = viewModel::onRemoveImage,
+                        onStart = { viewModel.onStart() },
+                        onPickFiles = { pickImagesLauncher.launch(imagePickRequest()) },
+                        onClearAll = viewModel::onClearAll,
+                        modifier = content,
+                    )
+                }
             }
         }
     }

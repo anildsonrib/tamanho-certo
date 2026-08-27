@@ -17,6 +17,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,12 +56,24 @@ fun ResizeScreen(
         // sistema abrir sozinho (pedido do responsavel em 2026-08-25).
         InputSummaryBlock(state.input)
 
-        TabRow(selectedTabIndex = form.mode.ordinal) {
+        // So a aba selecionada leva a cor da ferramenta; as outras ficam em
+        // `onSurfaceVariant`, como o `.tab` do mockup
+        // (`docs/mockups/index.html`), em que o accent entra apenas no
+        // `[data-selected="true"]`. O default do `TabRow` pinta as tres,
+        // porque o `unselectedContentColor` do `Tab` herda o `contentColor`
+        // da linha, que e o `primary`.
+        TabRow(
+            selectedTabIndex = form.mode.ordinal,
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.primary,
+        ) {
             ResizeMode.entries.forEach { mode ->
                 Tab(
                     selected = mode == form.mode,
                     onClick = { onFormChange(form.copy(mode = mode)) },
                     text = { Text(stringResource(mode.labelRes())) },
+                    selectedContentColor = MaterialTheme.colorScheme.primary,
+                    unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
