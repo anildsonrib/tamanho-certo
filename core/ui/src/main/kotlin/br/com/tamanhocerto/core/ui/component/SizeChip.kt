@@ -41,9 +41,17 @@ fun SizeChip(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    /**
+     * `false` deixa o chip visivel porem inerte. Usado pelos atalhos de
+     * tamanho maiores que o maior arquivo da selecao: eles nao comprimiriam
+     * nada. Desabilitar, e nao esconder, mantem a grade estavel — decisao do
+     * responsavel em 2026-08-27.
+     */
+    enabled: Boolean = true,
 ) {
     FilterChip(
         selected = selected,
+        enabled = enabled,
         onClick = onClick,
         shape = RoundedCornerShape(ChipCornerRadius),
         label = {

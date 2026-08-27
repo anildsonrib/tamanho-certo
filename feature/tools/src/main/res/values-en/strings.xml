@@ -114,6 +114,7 @@
     <string name="error_out_of_memory">This image is too large for your device to process. Try reducing its dimensions first.</string>
     <string name="error_cancelled">Cancelled.</string>
     <string name="error_unknown">Something went wrong with this file. Try another file or restart the app.</string>
+    <string name="target_not_chosen">Pick the maximum size.</string>
     <string name="invalid_target_zero">Enter a size greater than zero.</string>
     <string name="invalid_target_too_big">This photo is already %1$s. Pick a smaller limit, or enter a value under \"Advanced options\".</string>
     <string name="invalid_range">The range must be between 1 and %1$d.</string>

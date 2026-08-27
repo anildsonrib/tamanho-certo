@@ -30,6 +30,13 @@ data class InputSummary(
     val sizeText: String? = null,
     val pagesText: String? = null,
     val sizeBytes: Long? = null,
+    /**
+     * Maior arquivo da selecao. Define ate onde os atalhos de tamanho fazem
+     * sentido: alvo igual ou maior que ele nao comprime nada. Nulo quando
+     * algum arquivo nao informou o tamanho — ausencia de dado significa
+     * "nao sei", e ai nenhum atalho e desabilitado.
+     */
+    val maxSizeBytes: Long? = null,
     /** Ja formatado ("N arquivos selecionados"); so quando ha mais de um. */
     val multiCountText: String? = null,
     /** Ja formatado ("Tamanho total: X"); nulo se algum arquivo tiver tamanho desconhecido. */
@@ -53,7 +60,19 @@ data class InputItem(
 /** Bloqueio de formulario: a razao e uma chave de string, nunca texto solto. */
 sealed interface Validation {
     data object Ok : Validation
-    data class Blocked(@param:StringRes val reason: Int, val formatArg: Any? = null) : Validation
+    /**
+     * @param hint true quando o formulario esta apenas **incompleto**, nao
+     *   errado — falta escolher algo que ninguem escolheu ainda. Muda so o
+     *   tom da mensagem (informativo, nao vermelho); o botao continua
+     *   desabilitado nos dois casos. Criado em 2026-08-27: "Informe um
+     *   tamanho maior que zero" aparecia em vermelho assim que o usuario
+     *   escolhia os arquivos, acusando um erro que ele nao cometeu.
+     */
+    data class Blocked(
+        @param:StringRes val reason: Int,
+        val formatArg: Any? = null,
+        val hint: Boolean = false,
+    ) : Validation
 }
 
 data class NoticeState(

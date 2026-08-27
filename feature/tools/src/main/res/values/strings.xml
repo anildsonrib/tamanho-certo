@@ -144,6 +144,7 @@
     <string name="error_unknown">Algo deu errado ao processar este arquivo. Tente outro arquivo ou reinicie o app.</string>
 
     <!-- Bloqueios de formulario -->
+    <string name="target_not_chosen">Escolha o tamanho máximo.</string>
     <string name="invalid_target_zero">Informe um tamanho maior que zero.</string>
     <string name="invalid_target_too_big">Esta foto já tem %1$s. Escolha um limite menor, ou digite um valor em \"Opções avançadas\".</string>
     <string name="invalid_range">O intervalo precisa estar entre 1 e %1$d.</string>

@@ -71,16 +71,25 @@ fun CompressScreen(
         // selecionado" e o botao de baixo vira "Selecionar arquivos".
         InputSummaryBlock(state.input, state.tool.accent())
 
-        if (!form.qualityMode) {
+        // A pergunta do tamanho so aparece depois de escolher os arquivos
+        // (pedido do responsavel em 2026-08-27): sem arquivo nao ha o que
+        // responder, e o alvo fica sem referencia nenhuma.
+        if (!form.qualityMode && state.input.fileCount >= 1) {
             Text(
                 text = stringResource(R.string.compress_target_label),
                 style = MaterialTheme.typography.titleMedium,
             )
+            // Atalho igual ou maior que o maior arquivo da selecao nao
+            // comprime nada: fica visivel e inerte (pedido do responsavel em
+            // 2026-08-27 — desabilitar, nao esconder, para a grade nao mudar
+            // de tamanho). Tamanho desconhecido nao desabilita ninguem.
+            val maxBytes = state.input.maxSizeBytes
             ChipGrid(SizeShortcuts.values) { bytes, chipModifier ->
                 SizeChip(
                     label = shortcutLabel(bytes),
                     selected = form.targetBytes == bytes && form.customValue.isEmpty(),
                     onClick = { onFormChange(form.copy(targetBytes = bytes, customValue = "")) },
+                    enabled = maxBytes == null || bytes < maxBytes,
                     modifier = chipModifier,
                 )
             }
@@ -101,7 +110,10 @@ fun CompressScreen(
         AdvancedSection(form = form, onFormChange = onFormChange)
 
         (state.validation as? Validation.Blocked)?.let { blocked ->
-            NoticeCard(text = blockedText(blocked), kind = NoticeKind.ERROR)
+            NoticeCard(
+                text = blockedText(blocked),
+                kind = if (blocked.hint) NoticeKind.INFO else NoticeKind.ERROR,
+            )
         }
 
         ToolActionBar(

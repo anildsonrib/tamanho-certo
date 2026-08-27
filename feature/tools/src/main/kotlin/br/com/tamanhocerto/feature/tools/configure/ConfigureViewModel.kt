@@ -81,15 +81,17 @@ class ConfigureViewModel @Inject constructor(
             sources = if (append) sources + picked else picked
             val first = sources.firstOrNull()
             val items = sources.map { InputItem(displayName = it.displayName ?: "") }
-            val totalBytes = sources.map { it.byteSize }
-                .takeIf { it.isNotEmpty() && it.all { size -> size != null } }
-                ?.sumOf { it!! }
+            val sizes = sources.map { it.byteSize }
+            val allKnown = sizes.isNotEmpty() && sizes.all { it != null }
+            val totalBytes = sizes.takeIf { allKnown }?.sumOf { it!! }
+            val maxBytes = sizes.takeIf { allKnown }?.maxOf { it!! }
             _state.update { current ->
                 current.copy(
                     input = InputSummary(
                         fileCount = sources.size,
                         displayName = first?.displayName,
                         sizeBytes = first?.byteSize,
+                        maxSizeBytes = maxBytes,
                         sizeText = first?.byteSize?.let {
                             context.getString(R.string.input_size, formatSize(it))
                         },
@@ -109,6 +111,7 @@ class ConfigureViewModel @Inject constructor(
             // campo `format` do formulario continua existindo — passa a ser
             // preenchido aqui, a partir do arquivo, em vez de pela tela.
             adoptSourceFormat(uris.firstOrNull())
+            dropUnusableTarget(maxBytes)
 
             revalidate()
 
@@ -148,6 +151,22 @@ class ConfigureViewModel @Inject constructor(
                 is OperationForm.Resize -> current.copy(form = f.copy(format = format))
                 else -> current
             }
+        }
+    }
+
+    /**
+     * Limpa o alvo que deixou de fazer sentido para a selecao atual. Um alvo
+     * igual ou maior que o maior arquivo nao comprime nada — o atalho
+     * correspondente fica desabilitado na tela, e deixa-lo marcado seria
+     * mostrar uma escolha impossivel de desfazer pelo toque.
+     */
+    private fun dropUnusableTarget(maxBytes: Long?) {
+        if (maxBytes == null) return
+        _state.update { current ->
+            val form = current.form as? OperationForm.Compress ?: return@update current
+            val target = form.targetBytes ?: return@update current
+            if (target < maxBytes) current
+            else current.copy(form = form.copy(targetBytes = null, customValue = ""))
         }
     }
 
@@ -379,10 +398,22 @@ class ConfigureViewModel @Inject constructor(
     }
 
     private fun ConfigureUiState.validate(): Validation {
+        // Sem arquivo nao ha o que validar: o botao de baixo e "Selecionar
+        // arquivos", nao o verbo da ferramenta. Ate 2026-08-27 o formulario
+        // era validado assim mesmo, e abrir/fechar "Opcoes avancadas" —
+        // que passa por `onFormChanged` — fazia aparecer "Informe um tamanho
+        // maior que zero" numa tela onde nada tinha sido escolhido ainda.
+        if (input.fileCount < 1) return Validation.Ok
+
         val originalSize = input.sizeBytes
         return when (val form = form) {
             is OperationForm.Compress -> when {
                 form.qualityMode -> Validation.Ok
+                // Nada escolhido ainda: instrucao, nao erro.
+                form.targetBytes == null && form.customValue.isEmpty() ->
+                    Validation.Blocked(R.string.target_not_chosen, hint = true)
+
+                // Aqui o usuario digitou algo que nao serve — ai sim e erro.
                 form.targetBytes == null || form.targetBytes <= 0 ->
                     Validation.Blocked(R.string.invalid_target_zero)
 
